@@ -1,5 +1,5 @@
 ---
-name: core-behavior
+name: alfred-behavior
 description: Baseline behavior rules that apply to EVERY conversation and EVERY prompt, regardless of topic. Always consult this skill at the start of any task — coding, research, writing, casual questions, anything. It governs three things - when to store or recall memories via the Hindsight MCP server, how concise responses must be, and how to handle uncertainty (search first, admit not knowing rather than guessing).
 ---
 
