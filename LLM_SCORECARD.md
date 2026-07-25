@@ -184,13 +184,13 @@ For each model, keep a running list of observations under each aspect — short 
 
 | Aspect | Notes |
 |---|---|
-| Reasoning | + does research very well; when it doesn't know something, it admits it rather than making it up |
+| Reasoning | + does research very well; when it doesn't know something, it admits it rather than making it up; - asked about a CrowdStrike Falcon repo ("xdr_indicators"), did thorough research and correctly said there's no publicly known info rather than guessing, but missed that it's actually a CrowdStrike Falcon LogScale repo where XDR indicators are stored |
 | Coding | |
 | Instruction-following | |
 | Tool use / agentic | |
 | Context handling | |
 | Speed / latency | |
-| Cost / efficiency | |
+| Cost / efficiency | - high-thinking mode is expensive; a single research-heavy question cost close to $3 — think carefully about credit usage before invoking the high-thinking tier |
 | Refusals / safety behavior | |
 | Formatting / output quality | |
 | Other | + favorite for writing system prompts — system prompts written by GLM 5.2 transfer well and are stuck to across other models, whereas system prompts written by Sonnet 5, Opus 4.8, and ChatGPT 5.5 Terra did not generalize as well across models |
