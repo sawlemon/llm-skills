@@ -1,6 +1,6 @@
-# LLM Scorecard
+# LLM Report Card
 
-Per-model scorecard of observed strengths and weaknesses, organized by provider → model.
+Per-model report card of observed strengths and weaknesses, organized by provider → model.
 
 ## How to use
 
@@ -213,3 +213,37 @@ For each model, keep a running list of observations under each aspect — short 
 | Refusals / safety behavior | |
 | Formatting / output quality | |
 | Other | + impressive overall, looks great on benchmarks, worth checking out more; tested via the xAI platform, ran out of trial quota before testing further; + memory-synthesis output over Hindsight MCP was very impressive, would love using this model |
+
+---
+
+## NVIDIA (Speech-to-Text / ASR)
+
+### Parakeet V3
+
+| Aspect | Notes |
+|---|---|
+| Reasoning | |
+| Coding | |
+| Instruction-following | |
+| Tool use / agentic | |
+| Context handling | processes the full voice input and returns the transcription as a whole, rather than streaming live |
+| Speed / latency | + very fast |
+| Cost / efficiency | |
+| Refusals / safety behavior | |
+| Formatting / output quality | + reliably accurate |
+| Other | previous go-to for voice-to-text before switching to Parakeet Unified for live/streaming transcription |
+
+### Parakeet Unified ENG 0.6B
+
+| Aspect | Notes |
+|---|---|
+| Reasoning | |
+| Coding | |
+| Instruction-following | |
+| Tool use / agentic | |
+| Context handling | + supports live/streaming transcription (vs. Parakeet V3's whole-input-then-output approach) |
+| Speed / latency | |
+| Cost / efficiency | |
+| Refusals / safety behavior | |
+| Formatting / output quality | + very accurate on live transcription — correctly recognized colleagues' Tamil names spoken mid-sentence |
+| Other | + current voice-to-text model of choice; impressed with its live performance |
