@@ -51,7 +51,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Reasoning | |
 | Coding | |
 | Instruction-following | + sticks to the system prompt and the user's input prompt very thoroughly — will follow through on what's given even if it's wrong, rather than second-guessing it; this forces the user to think harder about the problem and write a good prompt, which was liked as a challenge |
-| Tool use / agentic | |
+| Tool use / agentic | + via the Antigravity CLI subscription, is able to invoke the web search tool; - via the Anthropic Claude Pro subscription, cannot use web search — seems to be a restriction Anthropic imposes on that plan/surface rather than a model limitation |
 | Context handling | |
 | Speed / latency | |
 | Cost / efficiency | |
