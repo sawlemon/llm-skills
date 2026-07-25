@@ -74,6 +74,21 @@ For each model, keep a running list of observations under each aspect — short 
 | Formatting / output quality | |
 | Other | + astonishingly good, but only within Anthropic's own tools (Claude Code, Claude Desktop); Claude Code is fine, but dislike Claude Desktop's UI/UX; main downside is lack of flexibility to use the model well through third-party tools/apps |
 
+### Claude Opus 5
+
+| Aspect | Notes |
+|---|---|
+| Reasoning | |
+| Coding | |
+| Instruction-following | - like the other Claude models, doesn't adhere to a custom injected system prompt on its own |
+| Tool use / agentic | + when explicitly told (on a later turn) to use Hindsight MCP, performed the recall correctly and laid results out concisely — not over- or under-explained, just the right amount |
+| Context handling | |
+| Speed / latency | |
+| Cost / efficiency | |
+| Refusals / safety behavior | |
+| Formatting / output quality | |
+| Other | initial impression is good; still early, needs more testing before a firm verdict |
+
 ---
 
 ## OpenAI
