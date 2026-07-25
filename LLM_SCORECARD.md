@@ -179,3 +179,22 @@ For each model, keep a running list of observations under each aspect — short 
 | Refusals / safety behavior | |
 | Formatting / output quality | |
 | Other | + favorite for writing system prompts — system prompts written by GLM 5.2 transfer well and are stuck to across other models, whereas system prompts written by Sonnet 5, Opus 4.8, and ChatGPT 5.5 Terra did not generalize as well across models |
+
+---
+
+## xAI
+
+### Grok 4.5
+
+| Aspect | Notes |
+|---|---|
+| Reasoning | |
+| Coding | |
+| Instruction-following | + sticks to what's requested; behaved well on prompted tasks |
+| Tool use / agentic | + asked how the week went, it queried Hindsight MCP and synthesized a summary across the whole week on its own — surfaced both the bad things that happened and unprompted highlighted the positives too; asked again scoped to just the past two days but it still returned a summary of the entire week |
+| Context handling | - 500k context window per spec sheet, smaller than other models now at up to 1M — but plenty for light usage, not a real downside in practice |
+| Speed / latency | |
+| Cost / efficiency | |
+| Refusals / safety behavior | |
+| Formatting / output quality | |
+| Other | + impressive overall, looks great on benchmarks, worth checking out more; tested via the xAI platform, ran out of trial quota before testing further; + memory-synthesis output over Hindsight MCP was very impressive, would love using this model |
