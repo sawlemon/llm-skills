@@ -50,8 +50,8 @@ For each model, keep a running list of observations under each aspect — short 
 |---|---|
 | Reasoning | |
 | Coding | |
-| Instruction-following | + sticks to the system prompt and the user's input prompt very thoroughly — will follow through on what's given even if it's wrong, rather than second-guessing it; this forces the user to think harder about the problem and write a good prompt, which was liked as a challenge |
-| Tool use / agentic | + via the Antigravity CLI subscription, is able to invoke the web search tool; - via the Anthropic Claude Pro subscription, cannot use web search — seems to be a restriction Anthropic imposes on that plan/surface rather than a model limitation |
+| Instruction-following | + sticks to the system prompt and the user's input prompt very thoroughly — will follow through on what's given even if it's wrong, rather than second-guessing it; this forces the user to think harder about the problem and write a good prompt, which was liked as a challenge; + via the Antigravity subscription, correctly follows the custom Hindsight memory system prompt; unclear why the same system prompt doesn't work as well through the Claude Pro subscription |
+| Tool use / agentic | + via the Antigravity CLI subscription, is able to invoke the web search tool; - via the Anthropic Claude Pro subscription, cannot use web search — seems to be a restriction Anthropic imposes on that plan/surface rather than a model limitation; + given a screenshot of a podcast list, extracted the list and correctly called Hindsight's retain to save it, without triggering an unnecessary recall first — showing the memory-gate logic in the custom prompt is being followed properly |
 | Context handling | |
 | Speed / latency | |
 | Cost / efficiency | |
