@@ -35,7 +35,7 @@ For each model, keep a running list of observations under each aspect — short 
 |---|---|
 | Reasoning | |
 | Coding | |
-| Instruction-following | - outside first-party tools (e.g. via Cherry Studio), doesn't reliably stick to an injected system prompt |
+| Instruction-following | - outside first-party tools (e.g. via Cherry Studio), doesn't reliably stick to an injected system prompt; likely not a model issue — Opus 5's investigation (see below) traced this to the CLI proxy stripping the custom system prompt and injecting its own, so may not reflect on Sonnet 5 itself |
 | Tool use / agentic | - doesn't use third-party built-in search tools (e.g. Cherry Studio's) well |
 | Context handling | |
 | Speed / latency | |
@@ -65,7 +65,7 @@ For each model, keep a running list of observations under each aspect — short 
 |---|---|
 | Reasoning | |
 | Coding | + methodical on Playwright script task — inferred idempotency requirement unprompted, and auto-implemented a diff-only extraction after recognizing repeated calls would otherwise mean rewriting the memories on a hindsight server |
-| Instruction-following | - outside first-party tools (e.g. via Cherry Studio), doesn't reliably stick to an injected system prompt; unlike Opus 4.6, given the same prompt it thinks on its own and intelligently interprets what the user needs rather than following the prompt literally as given |
+| Instruction-following | - outside first-party tools (e.g. via Cherry Studio), doesn't reliably stick to an injected system prompt; unlike Opus 4.6, given the same prompt it thinks on its own and intelligently interprets what the user needs rather than following the prompt literally as given; likely not a model issue — see Opus 5's root-cause investigation below (CLI proxy strips the custom system prompt) |
 | Tool use / agentic | - doesn't use third-party built-in search tools (e.g. Cherry Studio's) well; + within Claude Code, self-verifies by running its own tests after implementing each feature rather than assuming correctness |
 | Context handling | |
 | Speed / latency | |
@@ -78,16 +78,16 @@ For each model, keep a running list of observations under each aspect — short 
 
 | Aspect | Notes |
 |---|---|
-| Reasoning | |
+| Reasoning | + asked to diagnose why a custom system prompt wasn't going through when invoked from Cherry Studio via a CLI proxy API; without being given the proxy's source code, it researched online and correctly traced the root cause: the proxy strips the custom system prompt, sets a "Claude Code"-style header, and injects its own agent system prompt instead — correctly concluded Cherry Studio itself was not the problem |
 | Coding | |
 | Instruction-following | - like the other Claude models, doesn't adhere to a custom injected system prompt on its own |
-| Tool use / agentic | + when explicitly told (on a later turn) to use Hindsight MCP, performed the recall correctly and laid results out concisely — not over- or under-explained, just the right amount |
+| Tool use / agentic | + when explicitly told (on a later turn) to use Hindsight MCP, performed the recall correctly and laid results out concisely — not over- or under-explained, just the right amount; + spawned two agents to investigate the CLI proxy issue, both completed their tasks and contributed to correctly identifying the root cause and suggesting fixes |
 | Context handling | |
 | Speed / latency | |
-| Cost / efficiency | |
+| Cost / efficiency | - the CLI proxy investigation (with two spawned agents) consumed roughly 30% of usage for a single question — token-hungry, though notably less so than Fable 5 was |
 | Refusals / safety behavior | |
 | Formatting / output quality | |
-| Other | initial impression is good; still early, needs more testing before a firm verdict |
+| Other | initial impression is good; still early, needs more testing before a firm verdict; + impressive investigative/root-cause diagnosis capability |
 
 ---
 
