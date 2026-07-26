@@ -206,13 +206,13 @@ For each model, keep a running list of observations under each aspect — short 
 | Reasoning | |
 | Coding | |
 | Instruction-following | + sticks to what's requested; behaved well on prompted tasks |
-| Tool use / agentic | + asked how the week went, it queried Hindsight MCP and synthesized a summary across the whole week on its own — surfaced both the bad things that happened and unprompted highlighted the positives too; asked again scoped to just the past two days but it still returned a summary of the entire week |
+| Tool use / agentic | + asked how the week went, it queried Hindsight MCP and synthesized a summary across the whole week on its own — surfaced both the bad things that happened and unprompted highlighted the positives too; asked again scoped to just the past two days but it still returned a summary of the entire week; + on normal day-to-day interaction, commits to the Hindsight memory bank before even giving a response, and pulls in the proper context (e.g. knows about the user's ADHD and other relevant personal context) |
 | Context handling | - 500k context window per spec sheet, smaller than other models now at up to 1M — but plenty for light usage, not a real downside in practice |
 | Speed / latency | |
 | Cost / efficiency | |
 | Refusals / safety behavior | |
 | Formatting / output quality | |
-| Other | + impressive overall, looks great on benchmarks, worth checking out more; tested via the xAI platform, ran out of trial quota before testing further; + memory-synthesis output over Hindsight MCP was very impressive, would love using this model |
+| Other | + impressive overall, looks great on benchmarks, worth checking out more; tested via the xAI platform, ran out of trial quota before testing further; + memory-synthesis output over Hindsight MCP was very impressive, would love using this model; + great for day-to-day usage, really understands the user well |
 
 ---
 
