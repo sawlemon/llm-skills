@@ -82,7 +82,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Coding | |
 | Instruction-following | - like the other Claude models, doesn't adhere to a custom injected system prompt on its own |
 | Tool use / agentic | + when explicitly told (on a later turn) to use Hindsight MCP, performed the recall correctly and laid results out concisely — not over- or under-explained, just the right amount; + spawned two agents to investigate the CLI proxy issue, both completed their tasks and contributed to correctly identifying the root cause and suggesting fixes |
-| Context handling | |
+| Context handling | - heard on Twitter (not personally verified): Claude Desktop defaults to a 200k context window out of the box, and users have to manually switch the model setting to get the 1M context window; own take is that the 200k default is probably fine for quick tasks on Desktop, so it may not matter much in practice |
 | Speed / latency | |
 | Cost / efficiency | - the CLI proxy investigation (with two spawned agents) consumed roughly 30% of usage for a single question — token-hungry, though notably less so than Fable 5 was |
 | Refusals / safety behavior | |
