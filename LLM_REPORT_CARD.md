@@ -247,3 +247,22 @@ For each model, keep a running list of observations under each aspect — short 
 | Refusals / safety behavior | | |
 | Formatting / output quality | very accurate live transcription; correctly recognized colleagues' Tamil names mid-sentence | |
 | Other | current voice-to-text model of choice; live performance impressive | |
+
+---
+
+## Unknown Provider
+
+### Big Pickle
+
+| Aspect | Pros | Cons |
+|---|---|---|
+| Reasoning | | |
+| Coding | good at coding tasks | |
+| Instruction-following | | |
+| Tool use / agentic | good at agentic tasks; successfully SSHed into remote server and made config changes | |
+| Context handling | | |
+| Speed / latency | | |
+| Cost / efficiency | strong fallback when Anthropic or OpenAI subscription limits are reached | |
+| Refusals / safety behavior | | |
+| Formatting / output quality | | |
+| Other | behaves well for simple tasks | model provider is anonymous; provider unknown, cannot categorize under a provider section yet; untested on long-running or highly complex tasks |
