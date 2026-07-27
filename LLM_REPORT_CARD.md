@@ -157,6 +157,21 @@ For each model, keep a running list of observations under each aspect — short 
 | Formatting / output quality | | |
 | Other | now used for Cherry Studio chat-naming, replacing 3.1 Flash; very impressive overall; await more updates after further testing | chat-naming verdict pending |
 
+### Gemini 3.6 Flash High
+
+| Aspect | Pros | Cons |
+|---|---|---|
+| Reasoning | | |
+| Coding | | |
+| Instruction-following | | |
+| Tool use / agentic | goes above and beyond to find and fix issues autonomously (e.g. fixed hindsight MCP server re-rank error by changing recall model provider, and replaced missing GPTOSS 120B model with GPT OSS20B after checking logs during Docker image update); frequently executes multiple tool calls and updates on its own | makes many autonomous decisions without asking the user for input or confirmation |
+| Context handling | | |
+| Speed / latency | very quick to find out issues | |
+| Cost / efficiency | | |
+| Refusals / safety behavior | | |
+| Formatting / output quality | | |
+| Other | | |
+
 ---
 
 ## DeepSeek
