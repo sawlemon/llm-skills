@@ -93,20 +93,20 @@ For each model, keep a running list of observations under each aspect — short 
 
 ## OpenAI
 
-### GPT 5.5 Terra
+### GPT 5.6 Terra
 
 | Aspect | Pros | Cons |
 |---|---|---|
 | Reasoning | | |
-| Coding | | |
+| Coding | successfully refactored LLM Report Card template from one mixed `Notes` column into separate `Pros` and `Cons` columns after Opus 5's earlier template was unsatisfactory | |
 | Instruction-following | works as expected in Cherry Studio with custom system prompts | ChatGPT desktop app's built-in model harness behaves weirdly and does not understand requests |
-| Tool use / agentic | | |
+| Tool use / agentic | with OpenCode, creates and works through a visible three-step todo list; workflow makes active model and todos clear | |
 | Context handling | | |
-| Speed / latency | | |
+| Speed / latency | extremely fast for quick, small tasks | |
 | Cost / efficiency | | |
 | Refusals / safety behavior | | |
 | Formatting / output quality | | |
-| Other | quite decent overall | still needs more testing |
+| Other | pairing GPT 5.6 Terra with OpenCode seems like a strong workflow: model selection and created todos remain visible | still needs more testing |
 
 ### GPT 5.6 Sol
 
