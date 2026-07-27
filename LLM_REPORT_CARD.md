@@ -148,14 +148,14 @@ For each model, keep a running list of observations under each aspect — short 
 |---|---|---|
 | Reasoning | | |
 | Coding | | |
-| Instruction-following | | |
+| Instruction-following | summarized scientific document in simple everyday English as requested | |
 | Tool use / agentic | | browser bookmark-extraction task stopped after four tool calls due to throttling/API rate limits; testing inconclusive |
 | Context handling | | |
-| Speed / latency | | |
-| Cost / efficiency | | |
+| Speed / latency | insanely fast; possibly faster than DeepSeek V4 Flash | Gemini endpoint unreliable at times; hard to confirm speed advantage due to provider variance |
+| Cost / efficiency | high request volume on OpenRouter across all providers | comparison with DeepSeek V4 Flash not fair — DeepSeek V4 Flash inferred via OpenRouter depends on provider token output |
 | Refusals / safety behavior | | |
 | Formatting / output quality | | |
-| Other | now used for Cherry Studio chat-naming, replacing 3.1 Flash | chat-naming verdict pending |
+| Other | now used for Cherry Studio chat-naming, replacing 3.1 Flash; very impressive overall; await more updates after further testing | chat-naming verdict pending |
 
 ---
 
