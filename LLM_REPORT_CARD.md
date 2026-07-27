@@ -87,7 +87,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Cost / efficiency | - the CLI proxy investigation (with two spawned agents) consumed roughly 30% of usage for a single question — token-hungry, though notably less so than Fable 5 was |
 | Refusals / safety behavior | |
 | Formatting / output quality | |
-| Other | initial impression is good; still early, needs more testing before a firm verdict; + impressive investigative/root-cause diagnosis capability; + behaves intelligently overall; - gave wrong answers twice, but corrected itself in the subsequent chat, admitting the earlier response was wrong — nothing critical this time, but this kind of after-the-fact self-correction could be destructive if it happened at a more crucial moment |
+| Other | initial impression is good; still early, needs more testing before a firm verdict; + impressive investigative/root-cause diagnosis capability; + behaves intelligently overall; - gave wrong answers twice, but corrected itself in the subsequent chat, admitting the earlier response was wrong — nothing critical this time, but this kind of after-the-fact self-correction could be destructive if it happened at a more crucial moment; - after a couple hours of testing, makes noticeably more mistakes than Opus 4.8 did, catching and self-correcting after the fact rather than getting it right the first time; would much rather it not make the mistake in the first place — need to stay alert for mistakes earlier in its process so they can be caught/prevented at the start rather than after the fact |
 
 ---
 
