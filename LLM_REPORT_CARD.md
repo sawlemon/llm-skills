@@ -87,7 +87,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Cost / efficiency | | CLI proxy investigation with two agents consumed roughly 30% of usage for one question; token-hungry, though less so than Fable 5 |
 | Refusals / safety behavior | | |
 | Formatting / output quality | | often emits multiple long paragraphs requiring reading and filtering instead of concise task-focused output |
-| Other | impressive investigative/root-cause diagnosis; behaves intelligently overall | early impression only; gave two wrong answers then corrected itself later; makes noticeably more mistakes than Opus 4.8 and self-corrects after rather than getting it right first time |
+| Other | impressive investigative/root-cause diagnosis; behaves intelligently overall | early impression only; gave two wrong answers then corrected itself later; makes noticeably more mistakes than Opus 4.8 and self-corrects after rather than getting it right first time; Twitter discussion also includes substantial user dissatisfaction despite strong benchmark scores, with reports that it makes frequent mistakes and takes autonomous actions users did not request |
 
 ---
 
