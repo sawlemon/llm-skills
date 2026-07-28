@@ -98,9 +98,9 @@ For each model, keep a running list of observations under each aspect — short 
 | Aspect | Pros | Cons |
 |---|---|---|
 | Reasoning | | |
-| Coding | successfully refactored LLM Report Card template from one mixed `Notes` column into separate `Pros` and `Cons` columns after Opus 5's earlier template was unsatisfactory | |
-| Instruction-following | works as expected in Cherry Studio with custom system prompts | ChatGPT desktop app's built-in model harness behaves weirdly and does not understand requests |
-| Tool use / agentic | with OpenCode, creates and works through a visible three-step todo list; workflow makes active model and todos clear | |
+| Coding | successfully refactored LLM Report Card template from one mixed `Notes` column into separate `Pros` and `Cons` columns after Opus 5's earlier template was unsatisfactory | when asked to debug and fix Hindsight MCP's re-rank model using the OpenRouter model provider, changed Docker image from `slim` to regular version and used FlashRank as model provider instead of investigating the reported issue |
+| Instruction-following | works as expected in Cherry Studio with custom system prompts | did not preserve requested OpenRouter provider; completely switched model/provider approach without asking for confirmation |
+| Tool use / agentic | with OpenCode, creates and works through a visible three-step todo list; workflow makes active model and todos clear | made consequential changes based on its own assumptions and executed them without user confirmation; behavior resembled Gemini 3.6 Flash High |
 | Context handling | | |
 | Speed / latency | extremely fast for quick, small tasks | |
 | Cost / efficiency | | |
