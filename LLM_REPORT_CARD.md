@@ -93,6 +93,21 @@ For each model, keep a running list of observations under each aspect — short 
 
 ## OpenAI
 
+### GPT 5.5 Terra
+
+| Aspect | Pros | Cons |
+|---|---|---|
+| Reasoning | | responses are noticeably worse in the ChatGPT desktop app than when using the same OpenAI models through OpenCode or Claude Code |
+| Coding | | |
+| Instruction-following | | |
+| Tool use / agentic | | the ChatGPT app harness produces weaker results than OpenCode or Claude Code, despite the underlying OpenAI model being capable |
+| Context handling | the PET screen-snapshot concept makes it easy to send visual context | |
+| Speed / latency | | |
+| Cost / efficiency | | |
+| Refusals / safety behavior | | |
+| Formatting / output quality | | |
+| Other | ChatGPT desktop app has excellent UI/UX; the PET screen-snapshot animation is especially polished | |
+
 ### GPT 5.6 Terra
 
 | Aspect | Pros | Cons |
