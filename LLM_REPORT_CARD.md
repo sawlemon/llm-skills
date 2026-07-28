@@ -93,35 +93,20 @@ For each model, keep a running list of observations under each aspect — short 
 
 ## OpenAI
 
-### GPT 5.5 Terra
+### GPT 5.6 Tera
 
 | Aspect | Pros | Cons |
 |---|---|---|
 | Reasoning | | responses are noticeably worse in the ChatGPT desktop app than when using the same OpenAI models through OpenCode or Claude Code |
-| Coding | | |
-| Instruction-following | | |
-| Tool use / agentic | | the ChatGPT app harness produces weaker results than OpenCode or Claude Code, despite the underlying OpenAI model being capable |
-| Context handling | the PET screen-snapshot concept makes it easy to send visual context | |
-| Speed / latency | | |
-| Cost / efficiency | | |
-| Refusals / safety behavior | | |
-| Formatting / output quality | | |
-| Other | ChatGPT desktop app has excellent UI/UX; the PET screen-snapshot animation is especially polished | |
-
-### GPT 5.6 Terra
-
-| Aspect | Pros | Cons |
-|---|---|---|
-| Reasoning | | |
 | Coding | successfully refactored LLM Report Card template from one mixed `Notes` column into separate `Pros` and `Cons` columns after Opus 5's earlier template was unsatisfactory | when asked to debug and fix Hindsight MCP's re-rank model using the OpenRouter model provider, changed Docker image from `slim` to regular version and used FlashRank as model provider instead of investigating the reported issue |
 | Instruction-following | works as expected in Cherry Studio with custom system prompts | did not preserve requested OpenRouter provider; completely switched model/provider approach without asking for confirmation |
-| Tool use / agentic | with OpenCode, creates and works through a visible three-step todo list; workflow makes active model and todos clear | made consequential changes based on its own assumptions and executed them without user confirmation; behavior resembled Gemini 3.6 Flash High |
-| Context handling | | |
+| Tool use / agentic | with OpenCode, creates and works through a visible three-step todo list; workflow makes active model and todos clear | made consequential changes based on its own assumptions and executed them without user confirmation; behavior resembled Gemini 3.6 Flash High; the ChatGPT app harness produces weaker results than OpenCode or Claude Code, despite the underlying OpenAI model being capable |
+| Context handling | the PET screen-snapshot concept makes it easy to send visual context | |
 | Speed / latency | extremely fast for quick, small tasks | |
 | Cost / efficiency | | |
 | Refusals / safety behavior | | |
 | Formatting / output quality | | |
-| Other | pairing GPT 5.6 Terra with OpenCode seems like a strong workflow: model selection and created todos remain visible | still needs more testing |
+| Other | pairing GPT 5.6 Tera with OpenCode seems like a strong workflow: model selection and created todos remain visible; ChatGPT desktop app has excellent UI/UX, and the PET screen-snapshot animation is especially polished | still needs more testing |
 
 ### GPT 5.6 Sol
 
