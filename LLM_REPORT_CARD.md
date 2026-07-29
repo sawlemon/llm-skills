@@ -142,35 +142,20 @@ For each model, keep a running list of observations under each aspect — short 
 | Formatting / output quality | | Cherry Studio chat titles wrong, all caps, weird format; suspect backend issue |
 | Other | | unreliable as search assistant and poor for chat-naming; not used much |
 
-### Gemini 3.6 Flash
+### Gemini Flash 3.6
 
 | Aspect | Pros | Cons |
 |---|---|---|
 | Reasoning | | |
 | Coding | | |
 | Instruction-following | summarized scientific document in simple everyday English as requested | |
-| Tool use / agentic | | browser bookmark-extraction task stopped after four tool calls due to throttling/API rate limits; testing inconclusive |
+| Tool use / agentic | goes above and beyond to find and fix issues autonomously (e.g. fixed hindsight MCP server re-rank error by changing recall model provider, and replaced missing GPTOSS 120B model with GPT OSS20B after checking logs during Docker image update); frequently executes multiple tool calls and updates on its own | browser bookmark-extraction task stopped after four tool calls due to throttling/API rate limits; testing inconclusive; makes many autonomous decisions without asking the user for input or confirmation |
 | Context handling | | |
-| Speed / latency | insanely fast; possibly faster than DeepSeek V4 Flash | Gemini endpoint unreliable at times; hard to confirm speed advantage due to provider variance |
+| Speed / latency | insanely fast; possibly faster than DeepSeek V4 Flash; very quick to find out issues | Gemini endpoint unreliable at times; hard to confirm speed advantage due to provider variance |
 | Cost / efficiency | high request volume on OpenRouter across all providers | comparison with DeepSeek V4 Flash not fair — DeepSeek V4 Flash inferred via OpenRouter depends on provider token output |
 | Refusals / safety behavior | | |
 | Formatting / output quality | | |
 | Other | now used for Cherry Studio chat-naming, replacing 3.1 Flash; very impressive overall; await more updates after further testing | chat-naming verdict pending |
-
-### Gemini 3.6 Flash High
-
-| Aspect | Pros | Cons |
-|---|---|---|
-| Reasoning | | |
-| Coding | | |
-| Instruction-following | | |
-| Tool use / agentic | goes above and beyond to find and fix issues autonomously (e.g. fixed hindsight MCP server re-rank error by changing recall model provider, and replaced missing GPTOSS 120B model with GPT OSS20B after checking logs during Docker image update); frequently executes multiple tool calls and updates on its own | makes many autonomous decisions without asking the user for input or confirmation |
-| Context handling | | |
-| Speed / latency | very quick to find out issues | |
-| Cost / efficiency | | |
-| Refusals / safety behavior | | |
-| Formatting / output quality | | |
-| Other | | |
 
 ---
 
