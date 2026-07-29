@@ -34,7 +34,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Aspect | Pros | Cons |
 |---|---|---|
 | Reasoning | | |
-| Coding | | |
+| Coding | built LLM scorecard app using Apple Design Skill; every aspect of the resulting website's output was impressive — decent model for web design/front-end work on small coding tasks | |
 | Instruction-following | when the system prompt actually reaches the model, follows every instruction given and remembers instructions from earlier in the same initial prompt | outside first-party tools (e.g. via Cherry Studio), doesn't reliably stick to an injected system prompt; not a model issue — Opus 5's investigation (see below) traced this to the CLI proxy stripping the custom system prompt and injecting its own, likely to avoid getting the account banned, so doesn't reflect on Sonnet 5 itself |
 | Tool use / agentic | | doesn't use third-party built-in search tools (e.g. Cherry Studio's) well |
 | Context handling | | |
