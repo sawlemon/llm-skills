@@ -1,50 +1,84 @@
-name: Deploy to GitHub Pages
+name: CI / Deploy to GitHub Pages
 
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
+# Least privilege by default; the deploy job widens this for itself only.
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
 
 jobs:
-  build:
+  ci:
+    name: Lint, test, build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Needed by actions/configure-pages, which only runs on push / manual dispatch.
+      pages: write
+    # Scoped per ref: successive pushes to a PR (or to main) cancel their own
+    # superseded CI runs and nothing else. Deploys live in a separate group below,
+    # so a new push can never cancel a deployment that is already in flight.
+    concurrency:
+      group: ci-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          # Single source of truth for the Node major; matches engines.node in package.json.
+          node-version-file: .nvmrc
           cache: npm
 
       - run: npm ci
 
-      - name: Validate report card and run tests
+      - name: Lint
+        run: npm run lint
+
+      - name: Check formatting
+        run: npm run format:check
+
+      # Runs before the tests so a malformed report card reports as
+      # "LLM_REPORT_CARD.md:<line>: <message>" rather than a build stack trace.
+      - name: Validate report card
+        run: npm run validate
+
+      - name: Test
         run: npm test
 
       - name: Build site
         run: npm run build
 
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
+        if: github.event_name != 'pull_request'
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
+        if: github.event_name != 'pull_request'
         with:
-          path: dist
+          path: apps/report-card/dist
 
   deploy:
-    needs: build
+    name: Deploy to Pages
+    needs: ci
+    # Pull requests validate only. Publishing happens for pushes to main and
+    # manual dispatch, so a fork PR can never deploy.
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    # Deployments serialise instead of cancelling: interrupting a live Pages
+    # deployment can leave the site half-published.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

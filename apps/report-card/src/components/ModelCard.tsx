@@ -1,5 +1,6 @@
 import { ThumbsDown, ThumbsUp } from 'lucide-react';
 import type { ModelEntry } from '../data/types';
+import { renderNote } from '../lib/renderNote';
 
 interface ModelCardProps {
   model: ModelEntry;
@@ -10,8 +11,8 @@ interface ModelCardProps {
 export function ModelCard({ model, highlightAspect, onSelect }: ModelCardProps) {
   const preview = highlightAspect
     ? model.aspects.find((entry) => entry.aspect === highlightAspect)
-    : model.aspects.find((entry) => entry.aspect === 'Other' && (entry.pros.length || entry.cons.length)) ??
-      model.aspects.find((entry) => entry.pros.length || entry.cons.length);
+    : (model.aspects.find((entry) => entry.aspect === 'Other' && (entry.pros.length || entry.cons.length)) ??
+      model.aspects.find((entry) => entry.pros.length || entry.cons.length));
 
   const previewNote = preview?.pros[0] ?? preview?.cons[0] ?? null;
   const previewTone = preview?.pros.length ? 'pro' : 'con';
@@ -28,7 +29,7 @@ export function ModelCard({ model, highlightAspect, onSelect }: ModelCardProps) 
       {previewNote ? (
         <span className={`model-card__note model-card__note--${previewTone}`}>
           <span className="model-card__note-aspect">{preview?.aspect}</span>
-          {previewNote}
+          {renderNote(previewNote)}
         </span>
       ) : (
         <span className="model-card__note model-card__note--empty">No observations recorded yet.</span>

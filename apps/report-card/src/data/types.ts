@@ -1,5 +1,28 @@
+/**
+ * The only aspect names a model table may use, in the order the site presents them.
+ *
+ * The parser rejects anything else, so a typo cannot silently mint a new aspect (and a new
+ * filter facet). Adding a genuinely new aspect means adding it here first, in its intended
+ * display position.
+ */
+export const CANONICAL_ASPECTS = [
+  'Reasoning',
+  'Coding',
+  'Instruction-following',
+  'Tool use / agentic',
+  'Context handling',
+  'Speed / latency',
+  'Cost / efficiency',
+  'Refusals / safety behavior',
+  'Formatting / output quality',
+  'Other',
+] as const;
+
+/** One of the {@link CANONICAL_ASPECTS} names. */
+export type CanonicalAspect = (typeof CANONICAL_ASPECTS)[number];
+
 export interface AspectEntry {
-  /** Aspect name exactly as written in the report card, e.g. "Tool use / agentic". */
+  /** Aspect name, always one of {@link CANONICAL_ASPECTS}, e.g. "Tool use / agentic". */
   aspect: string;
   /** Individual strengths noted for this aspect. Empty when nothing was recorded. */
   pros: string[];
@@ -36,7 +59,7 @@ export interface ReportCard {
   providers: ProviderEntry[];
   /** All models, flattened in source order. */
   models: ModelEntry[];
-  /** Every distinct aspect name seen, in first-seen order. */
+  /** Every distinct aspect name seen, in {@link CANONICAL_ASPECTS} order. */
   aspects: string[];
 }
 

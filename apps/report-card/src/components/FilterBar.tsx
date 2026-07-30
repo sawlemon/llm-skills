@@ -82,7 +82,11 @@ export function FilterBar({ providers, aspects, filters, resultCount, onChange }
         </p>
 
         {isFiltered ? (
-          <button type="button" className="text-button" onClick={() => onChange({ query: '', providerId: null, aspect: null })}>
+          <button
+            type="button"
+            className="text-button"
+            onClick={() => onChange({ query: '', providerId: null, aspect: null })}
+          >
             Reset
           </button>
         ) : null}

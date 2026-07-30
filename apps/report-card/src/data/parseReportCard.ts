@@ -1,4 +1,5 @@
 import {
+  CANONICAL_ASPECTS,
   ReportCardParseError,
   type AspectEntry,
   type ModelEntry,
@@ -7,6 +8,18 @@ import {
 } from './types';
 
 const EXPECTED_COLUMNS = ['aspect', 'pros', 'cons'];
+
+const CANONICAL_ASPECT_SET: ReadonlySet<string> = new Set(CANONICAL_ASPECTS);
+
+/** Canonical aspects keyed by their loose form, for suggesting a fix on a near miss. */
+const ASPECTS_BY_LOOSE_KEY: ReadonlyMap<string, string> = new Map(
+  CANONICAL_ASPECTS.map((aspect) => [looseAspectKey(aspect), aspect]),
+);
+
+/** Folds case and drops all whitespace, so "Tool use/agentic" keys the same as "Tool use / agentic". */
+function looseAspectKey(aspect: string): string {
+  return aspect.toLowerCase().replace(/\s+/g, '');
+}
 
 interface SourceLine {
   text: string;
@@ -95,13 +108,25 @@ export function splitNotes(cell: string): string[] {
   return notes.map((note) => note.trim()).filter((note) => note.length > 0);
 }
 
+/**
+ * Builds the error for an aspect name that is not in `CANONICAL_ASPECTS`, pointing at the
+ * closest canonical name when the difference is only case or whitespace.
+ */
+function unknownAspectError(aspect: string, modelName: string, line: number): ReportCardParseError {
+  const suggestion = ASPECTS_BY_LOOSE_KEY.get(looseAspectKey(aspect));
+  const fix = suggestion
+    ? `did you mean "${suggestion}"?`
+    : `expected one of [${CANONICAL_ASPECTS.join(', ')}]`;
+  return new ReportCardParseError(`model "${modelName}" has unknown aspect "${aspect}"; ${fix}`, line);
+}
+
 export function parseReportCard(markdown: string): ReportCard {
   const lines = stripFencedBlocks(markdown);
 
   let title = 'LLM Report Card';
   const providers: ProviderEntry[] = [];
   const models: ModelEntry[] = [];
-  const aspects: string[] = [];
+  const seenAspects = new Set<string>();
   const seenModelIds = new Set<string>();
 
   let provider: ProviderEntry | null = null;
@@ -209,6 +234,9 @@ export function parseReportCard(markdown: string): ReportCard {
     if (!aspect) {
       throw new ReportCardParseError(`model "${model.name}" has a row with an empty Aspect`, number);
     }
+    if (!CANONICAL_ASPECT_SET.has(aspect)) {
+      throw unknownAspectError(aspect, model.name, number);
+    }
 
     const entry: AspectEntry = {
       aspect,
@@ -220,7 +248,7 @@ export function parseReportCard(markdown: string): ReportCard {
     model.prosCount += entry.pros.length;
     model.consCount += entry.cons.length;
     if (entry.pros.length || entry.cons.length) model.coveredAspects.push(aspect);
-    if (!aspects.includes(aspect)) aspects.push(aspect);
+    seenAspects.add(aspect);
   }
 
   finishModel();
@@ -231,6 +259,9 @@ export function parseReportCard(markdown: string): ReportCard {
       1,
     );
   }
+
+  // Present aspects in canonical order regardless of authoring order, keeping only those used.
+  const aspects = CANONICAL_ASPECTS.filter((aspect) => seenAspects.has(aspect));
 
   return { title, providers, models, aspects };
 }
