@@ -79,7 +79,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Aspect | Pros | Cons |
 |---|---|---|
 | Reasoning | researched CLI proxy issue without source code and correctly traced it to proxy stripping custom prompt, setting Claude Code-style header, and injecting its own agent prompt; correctly concluded Cherry Studio was not problem | failed to identify separate session's memory deletion as cause of missing Hindsight observations; instead gave false explanation; reasoning sometimes misses facts and relies on wrong assumptions |
-| Coding | | |
+| Coding | same OpenCode variant-selection debug task that MiMo 2.5 failed: solved it, though tried many approaches that did not work and were out of scope before landing the fix | |
 | Instruction-following | follows every instruction and remembers earlier instructions in same initial prompt | outside first-party tools, does not reliably receive injected custom prompt; proxy strips it and injects its own system prompt |
 | Tool use / agentic | performed requested Hindsight recall correctly and concisely; spawned two agents that identified CLI proxy root cause; thorough Hindsight memory management, including URL expansion and collateral-damage checks; independently found and surfaced separate bug for future conversation | even in auto mode, sometimes asks user to run shell commands or confirm continuation instead of executing; may need `/goal` more often |
 | Context handling | | Claude Desktop reportedly defaults to 200k context; users must manually select 1M setting (not personally verified) |
@@ -213,6 +213,25 @@ For each model, keep a running list of observations under each aspect — short 
 | Refusals / safety behavior | | |
 | Formatting / output quality | | |
 | Other | impressive overall and benchmarks look strong; Hindsight memory synthesis impressive; great for day-to-day use and understands user well | xAI trial quota ended before further testing |
+
+---
+
+## Xiaomi
+
+### MiMo 2.5
+
+| Aspect | Pros | Cons |
+|---|---|---|
+| Reasoning | | on OpenCode variant-selection availability debug: gave false ideas and an incredibly dull solution that would have required far more effort than needed |
+| Coding | | failed same OpenCode variant-selection debug task that Opus 5 solved; proposed heavyweight path instead of the simple fix |
+| Instruction-following | | |
+| Tool use / agentic | | |
+| Context handling | | |
+| Speed / latency | | |
+| Cost / efficiency | | |
+| Refusals / safety behavior | | |
+| Formatting / output quality | | |
+| Other | | weak first impression on real debugging vs Opus 5 on identical task |
 
 ---
 
