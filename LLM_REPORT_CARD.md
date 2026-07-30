@@ -205,14 +205,14 @@ For each model, keep a running list of observations under each aspect — short 
 |---|---|---|
 | Reasoning | | |
 | Coding | | |
-| Instruction-following | sticks to requests; behaved well on prompted tasks | |
-| Tool use / agentic | autonomously queried Hindsight MCP and synthesized weekly summary, including positives; commits to Hindsight memory bank before responding and pulls relevant user context | when re-scoped from week to two days, still returned full-week summary |
+| Instruction-following | sticks to requests; behaved well on prompted tasks; only model observed in OpenCode that actually followed the Claude.md skill — loaded Hindsight MCP at the initial request, saved given info, and committed it to Hindsight at end of request completion | |
+| Tool use / agentic | autonomously queried Hindsight MCP and synthesized weekly summary, including positives; commits to Hindsight memory bank before responding and pulls relevant user context; cleverly inspected git log to match local commit-message patterns before committing | when re-scoped from week to two days, still returned full-week summary |
 | Context handling | | 500k context window is smaller than competitors' 1M, though sufficient for light usage |
 | Speed / latency | | |
 | Cost / efficiency | | |
 | Refusals / safety behavior | | |
 | Formatting / output quality | | |
-| Other | impressive overall and benchmarks look strong; Hindsight memory synthesis impressive; great for day-to-day use and understands user well | xAI trial quota ended before further testing |
+| Other | impressive overall and benchmarks look strong; Hindsight memory synthesis impressive; great for day-to-day use and understands user well; continues to impress on real agentic OpenCode workflows | xAI trial quota ended before further testing |
 
 ---
 
