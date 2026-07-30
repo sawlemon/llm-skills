@@ -238,7 +238,9 @@ describe('parseReportCard validation', () => {
 
   it('accepts a harness table using the harness aspect vocabulary', () => {
     const harnessTable = ['| Aspect | Pros | Cons |', '|---|---|---|', '| UI / UX | clean | |'].join('\n');
-    const card = parseReportCard(`# Card\n\n## Acme\n\n### Model X\n\n${table}\n\n## LLM Harness\n\n### Tool Y\n\n${harnessTable}\n`);
+    const card = parseReportCard(
+      `# Card\n\n## Acme\n\n### Model X\n\n${table}\n\n## LLM Harness\n\n### Tool Y\n\n${harnessTable}\n`,
+    );
     expect(card.harnesses.map((h) => h.name)).toEqual(['Tool Y']);
     expect(card.harnesses[0].aspects[0].aspect).toBe('UI / UX');
   });
@@ -246,7 +248,9 @@ describe('parseReportCard validation', () => {
   it('rejects a model aspect inside a harness table', () => {
     const harnessTable = ['| Aspect | Pros | Cons |', '|---|---|---|', '| Reasoning | good | |'].join('\n');
     expect(() =>
-      parseReportCard(`# Card\n\n## Acme\n\n### Model X\n\n${table}\n\n## LLM Harness\n\n### Tool Y\n\n${harnessTable}\n`),
+      parseReportCard(
+        `# Card\n\n## Acme\n\n### Model X\n\n${table}\n\n## LLM Harness\n\n### Tool Y\n\n${harnessTable}\n`,
+      ),
     ).toThrow(new RegExp(`unknown aspect "Reasoning"; expected one of \\[${HARNESS_ASPECTS.join(', ')}\\]`));
   });
 

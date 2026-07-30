@@ -104,7 +104,12 @@ export default function App() {
               </div>
               <div className="gallery__grid">
                 {reportCard.harnesses.map((harness) => (
-                  <ModelCard key={harness.id} model={harness} highlightAspect={null} onSelect={setSelectedId} />
+                  <ModelCard
+                    key={harness.id}
+                    model={harness}
+                    highlightAspect={null}
+                    onSelect={setSelectedId}
+                  />
                 ))}
               </div>
             </div>
