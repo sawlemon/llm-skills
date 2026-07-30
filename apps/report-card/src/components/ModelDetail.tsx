@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Check, Link2, ThumbsDown, ThumbsUp, X } from 'lucide-react';
-import { useState } from 'react';
 import type { ModelEntry } from '../data/types';
+import { renderNote } from '../lib/renderNote';
 
 interface ModelDetailProps {
   model: ModelEntry;
@@ -13,7 +13,10 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input, [tabindex]:not([tabin
 export function ModelDetail({ model, onClose }: ModelDetailProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
-  const [copied, setCopied] = useState(false);
+  // Tracked per model rather than as a bare boolean so that switching models in an
+  // already-open sheet resets the confirmation without a state-syncing effect.
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const copied = copiedId === model.id;
 
   useEffect(() => {
     closeRef.current?.focus();
@@ -23,10 +26,6 @@ export function ModelDetail({ model, onClose }: ModelDetailProps) {
       document.body.style.overflow = previousOverflow;
     };
   }, []);
-
-  useEffect(() => {
-    setCopied(false);
-  }, [model.id]);
 
   const onKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Escape') {
@@ -54,9 +53,9 @@ export function ModelDetail({ model, onClose }: ModelDetailProps) {
     const url = `${window.location.origin}${window.location.pathname}#${encodeURIComponent(model.id)}`;
     try {
       await navigator.clipboard.writeText(url);
-      setCopied(true);
+      setCopiedId(model.id);
     } catch {
-      setCopied(false);
+      setCopiedId(null);
     }
   };
 
@@ -64,7 +63,10 @@ export function ModelDetail({ model, onClose }: ModelDetailProps) {
   const hasNotes = model.prosCount + model.consCount > 0;
 
   return (
-    <div className="sheet-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+    <div
+      className="sheet-backdrop"
+      onMouseDown={(event) => event.target === event.currentTarget && onClose()}
+    >
       <div
         ref={dialogRef}
         className="sheet"
@@ -81,7 +83,12 @@ export function ModelDetail({ model, onClose }: ModelDetailProps) {
             </h2>
           </div>
           <div className="sheet__actions">
-            <button type="button" className="icon-button" onClick={copyLink} aria-label="Copy link to this model">
+            <button
+              type="button"
+              className="icon-button"
+              onClick={copyLink}
+              aria-label="Copy link to this model"
+            >
               {copied ? <Check aria-hidden="true" size={18} /> : <Link2 aria-hidden="true" size={18} />}
             </button>
             <button ref={closeRef} type="button" className="icon-button" onClick={onClose} aria-label="Close">
@@ -115,7 +122,7 @@ export function ModelDetail({ model, onClose }: ModelDetailProps) {
                       {entry.pros.length ? (
                         <ul className="notes notes--pro">
                           {entry.pros.map((note, index) => (
-                            <li key={index}>{note}</li>
+                            <li key={index}>{renderNote(note)}</li>
                           ))}
                         </ul>
                       ) : (
@@ -128,7 +135,7 @@ export function ModelDetail({ model, onClose }: ModelDetailProps) {
                       {entry.cons.length ? (
                         <ul className="notes notes--con">
                           {entry.cons.map((note, index) => (
-                            <li key={index}>{note}</li>
+                            <li key={index}>{renderNote(note)}</li>
                           ))}
                         </ul>
                       ) : (

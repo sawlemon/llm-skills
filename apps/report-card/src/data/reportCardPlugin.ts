@@ -1,16 +1,23 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { Plugin } from 'vite';
 import { parseReportCard } from './parseReportCard';
 
 const VIRTUAL_ID = 'virtual:report-card';
 const RESOLVED_ID = `\0${VIRTUAL_ID}`;
 
+/** The report card lives at the repo root, four levels above `apps/report-card/src/data`. */
+const DEFAULT_SOURCE_PATH = fileURLToPath(new URL('../../../../LLM_REPORT_CARD.md', import.meta.url));
+
 /**
  * Parses `LLM_REPORT_CARD.md` at build time and exposes it as `virtual:report-card`.
  * A malformed report card fails the build with the offending line number.
+ *
+ * `sourcePath` may be absolute (recommended, since the Vite root is `apps/report-card`
+ * while the report card lives at the repo root) or relative to the Vite root.
  */
-export function reportCardPlugin(sourcePath = 'LLM_REPORT_CARD.md'): Plugin {
+export function reportCardPlugin(sourcePath = DEFAULT_SOURCE_PATH): Plugin {
   let absolutePath = '';
 
   return {

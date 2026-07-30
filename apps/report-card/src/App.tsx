@@ -48,9 +48,9 @@ export default function App() {
         <section className="hero">
           <h1 className="hero__headline">Notes on how these models actually behave.</h1>
           <p className="hero__body">
-            A personal, continuously updated record of what I&apos;ve observed while using these models day to day.
-            These are subjective impressions from my own workflows — not benchmark results, not measurements, and not
-            universal advice.
+            A personal, continuously updated record of what I&apos;ve observed while using these models day to
+            day. These are subjective impressions from my own workflows — not benchmark results, not
+            measurements, and not universal advice.
           </p>
         </section>
 
@@ -92,8 +92,8 @@ export default function App() {
 
       <footer className="footer">
         <p>
-          Generated from <code>LLM_REPORT_CARD.md</code>, the single source of truth. Every deployment rebuilds this
-          page from that file.
+          Generated from <code>LLM_REPORT_CARD.md</code>, the single source of truth. Every deployment
+          rebuilds this page from that file.
         </p>
       </footer>
 

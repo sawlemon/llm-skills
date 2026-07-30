@@ -1,6 +1,7 @@
 :root {
-  --font-system: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', 'Segoe UI',
-    Roboto, system-ui, sans-serif;
+  --font-system:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', 'Segoe UI', Roboto, system-ui,
+    sans-serif;
   --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
 
   --canvas: #f5f5f7;
@@ -14,6 +15,7 @@
   --con: #b3261e;
   --pro-tint: rgba(29, 122, 63, 0.1);
   --con-tint: rgba(179, 38, 30, 0.09);
+  --code-tint: rgba(0, 0, 0, 0.055);
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
   --shadow-sheet: 0 24px 64px rgba(0, 0, 0, 0.24);
   --radius-card: 18px;
@@ -33,6 +35,7 @@
     --con: #ff6961;
     --pro-tint: rgba(79, 208, 122, 0.12);
     --con-tint: rgba(255, 105, 97, 0.12);
+    --code-tint: rgba(255, 255, 255, 0.11);
     --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.5);
     --shadow-sheet: 0 24px 64px rgba(0, 0, 0, 0.7);
   }
@@ -68,6 +71,11 @@ select {
 code {
   font-family: var(--font-mono);
   font-size: 0.88em;
+  padding: 0.1em 0.34em;
+  border-radius: 5px;
+  background: var(--code-tint);
+  color: var(--ink);
+  overflow-wrap: break-word;
 }
 
 .visually-hidden {
@@ -233,7 +241,10 @@ main {
   background: var(--surface);
   font-size: 14px;
   cursor: pointer;
-  transition: transform 0.18s var(--ease), background 0.18s var(--ease), color 0.18s var(--ease);
+  transition:
+    transform 0.18s var(--ease),
+    background 0.18s var(--ease),
+    color 0.18s var(--ease);
 }
 
 .chip:active {
@@ -317,7 +328,9 @@ main {
   box-shadow: var(--shadow-card);
   text-align: left;
   cursor: pointer;
-  transition: transform 0.24s var(--ease), box-shadow 0.24s var(--ease);
+  transition:
+    transform 0.24s var(--ease),
+    box-shadow 0.24s var(--ease);
 }
 
 .model-card:hover {
@@ -466,7 +479,9 @@ main {
   background: var(--hairline);
   color: var(--ink);
   cursor: pointer;
-  transition: transform 0.18s var(--ease), opacity 0.18s var(--ease);
+  transition:
+    transform 0.18s var(--ease),
+    opacity 0.18s var(--ease);
 }
 
 .icon-button:active {
