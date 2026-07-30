@@ -266,3 +266,82 @@ For each model, keep a running list of observations under each aspect — short 
 | Refusals / safety behavior | | |
 | Formatting / output quality | | |
 | Other | behaves well for simple tasks | model provider is anonymous; provider unknown, cannot categorize under a provider section yet; untested on long-running or highly complex tasks |
+
+---
+
+## LLM Harness
+
+### Claude Code
+
+| Aspect | Pros | Cons |
+|---|---|---|
+| Reasoning | | |
+| Coding | self-verifies by running tests after implementing each feature | |
+| Instruction-following | reliably delivers first-party system prompts to the model; Anthropic models follow every instruction and remember earlier ones from the same initial prompt | |
+| Tool use / agentic | creates and works through visible todo lists; workflow makes active model and todos clear | |
+| Context handling | | |
+| Speed / latency | | |
+| Cost / efficiency | | |
+| Refusals / safety behavior | | |
+| Formatting / output quality | markdown documentation output can be spot-on and well-formatted | on the same documentation prompt, non-desktop Claude Code output was noticeably less polished than the desktop app's, with no visual/diagram representation |
+| Other | astonishingly good pairing with Anthropic's own models; GPT 5.6 Tera + OpenCode/Claude Code outperforms the same model via ChatGPT desktop app | |
+
+### Claude Desktop
+
+| Aspect | Pros | Cons |
+|---|---|---|
+| Reasoning | | |
+| Coding | | |
+| Instruction-following | | |
+| Tool use / agentic | | |
+| Context handling | reportedly defaults to 200k context; users must manually select the 1M setting (not personally verified) | |
+| Speed / latency | | |
+| Cost / efficiency | close to $90 worth of tokens spent on a documentation task in one session | |
+| Refusals / safety behavior | | |
+| Formatting / output quality | markdown documentation output was spot-on, well-formatted, and unprompted included a visual diagram representation; on the same prompt/project, desktop output was clearly better than through Claude Code, suggesting the desktop app may be stronger for documentation tasks | |
+| Other | astonishingly good within Anthropic's own tools | dislike the UI/UX; lack of flexibility to use models well through it compared with third-party tools/apps |
+
+### ChatGPT Desktop App
+
+| Aspect | Pros | Cons |
+|---|---|---|
+| Reasoning | | |
+| Coding | | |
+| Instruction-following | | |
+| Tool use / agentic | | |
+| Context handling | the PET screen-snapshot concept makes it easy to send visual context | |
+| Speed / latency | | |
+| Cost / efficiency | | |
+| Refusals / safety behavior | | |
+| Formatting / output quality | | |
+| Other | excellent UI/UX; the PET screen-snapshot animation is especially polished | responses are noticeably worse here than when using the same OpenAI models through OpenCode or Claude Code; the harness itself produces weaker results despite the underlying model being capable |
+
+### Cherry Studio
+
+| Aspect | Pros | Cons |
+|---|---|---|
+| Reasoning | | |
+| Coding | | |
+| Instruction-following | works as expected with custom system prompts for some models (e.g. GPT 5.6 Tera) | doesn't reliably deliver an injected system prompt to first-party Anthropic models; traced to the CLI proxy stripping the custom prompt and injecting its own, likely to avoid getting the account banned — a harness/proxy issue, not a model issue |
+| Tool use / agentic | initially fast with good results as a search assistant (Gemini 3.1 Flash) | doesn't surface third-party built-in search tools well to Claude models; Gemini 3.1 Flash hallucinated details as search assistant |
+| Context handling | | |
+| Speed / latency | | |
+| Cost / efficiency | | |
+| Refusals / safety behavior | | |
+| Formatting / output quality | | chat titles sometimes wrong, all caps, weird format; suspect backend issue |
+| Other | | unreliable chat-naming with some models; general fragility around system-prompt delivery to Anthropic models |
+
+### OpenCode
+
+| Aspect | Pros | Cons |
+|---|---|---|
+| Reasoning | | |
+| Coding | | |
+| Instruction-following | | |
+| Tool use / agentic | with GPT 5.6 Tera, creates and works through a visible three-step todo list; workflow makes active model and todos clear | |
+| Context handling | | |
+| Speed / latency | | |
+| Cost / efficiency | | |
+| Refusals / safety behavior | | |
+| Formatting / output quality | | |
+| Other | pairing GPT 5.6 Tera with OpenCode seems like a strong workflow: model selection and created todos remain visible | |
