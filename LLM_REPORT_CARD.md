@@ -271,77 +271,69 @@ For each model, keep a running list of observations under each aspect — short 
 
 ## LLM Harness
 
+Harnesses are the apps/CLIs that models run inside. They're judged on different things than the models themselves, so these tables use harness-specific aspects: UI / UX, Ease of use, Customizability, Flexibility, Speed / responsiveness, Resource consumption, Model support, Other.
+
 ### Claude Code
 
 | Aspect | Pros | Cons |
 |---|---|---|
-| Reasoning | | |
-| Coding | self-verifies by running tests after implementing each feature | |
-| Instruction-following | reliably delivers first-party system prompts to the model; Anthropic models follow every instruction and remember earlier ones from the same initial prompt | |
-| Tool use / agentic | creates and works through visible todo lists; workflow makes active model and todos clear | |
-| Context handling | | |
-| Speed / latency | | |
-| Cost / efficiency | | |
-| Refusals / safety behavior | | |
-| Formatting / output quality | markdown documentation output can be spot-on and well-formatted | on the same documentation prompt, non-desktop Claude Code output was noticeably less polished than the desktop app's, with no visual/diagram representation |
-| Other | astonishingly good pairing with Anthropic's own models; GPT 5.6 Tera + OpenCode/Claude Code outperforms the same model via ChatGPT desktop app | |
+| UI / UX | clean CLI workflow; creates and works through visible todo lists so the active model and progress stay clear | |
+| Ease of use | self-verifies by running tests after implementing each feature, so less hand-holding needed | |
+| Customizability | | |
+| Flexibility | | non-desktop Claude Code produced noticeably less polished documentation than the desktop app on the same prompt, with no visual/diagram representation |
+| Speed / responsiveness | | |
+| Resource consumption | | |
+| Model support | reliably delivers first-party system prompts to Anthropic models, which then follow every instruction and remember earlier ones from the same initial prompt; strong pairing with GPT 5.6 Tera, outperforming the same model via ChatGPT desktop app | |
+| Other | astonishingly good pairing with Anthropic's own models | |
 
 ### Claude Desktop
 
 | Aspect | Pros | Cons |
 |---|---|---|
-| Reasoning | | |
-| Coding | | |
-| Instruction-following | | |
-| Tool use / agentic | | |
-| Context handling | reportedly defaults to 200k context; users must manually select the 1M setting (not personally verified) | |
-| Speed / latency | | |
-| Cost / efficiency | close to $90 worth of tokens spent on a documentation task in one session | |
-| Refusals / safety behavior | | |
-| Formatting / output quality | markdown documentation output was spot-on, well-formatted, and unprompted included a visual diagram representation; on the same prompt/project, desktop output was clearly better than through Claude Code, suggesting the desktop app may be stronger for documentation tasks | |
-| Other | astonishingly good within Anthropic's own tools | dislike the UI/UX; lack of flexibility to use models well through it compared with third-party tools/apps |
+| UI / UX | | dislike the UI/UX |
+| Ease of use | | context defaults to 200k; users must manually select the 1M setting (reported, not personally verified) |
+| Customizability | | |
+| Flexibility | markdown documentation output was spot-on, well-formatted, and unprompted included a visual diagram; on the same prompt/project, desktop output was clearly better than through Claude Code, suggesting it may be stronger for documentation tasks | lack of flexibility to use models well compared with third-party tools/apps |
+| Speed / responsiveness | | |
+| Resource consumption | | close to $90 worth of tokens spent on a documentation task in one session |
+| Model support | astonishingly good within Anthropic's own models | |
+| Other | | |
 
 ### ChatGPT Desktop App
 
 | Aspect | Pros | Cons |
 |---|---|---|
-| Reasoning | | |
-| Coding | | |
-| Instruction-following | | |
-| Tool use / agentic | | |
-| Context handling | the PET screen-snapshot concept makes it easy to send visual context | |
-| Speed / latency | | |
-| Cost / efficiency | | |
-| Refusals / safety behavior | | |
-| Formatting / output quality | | |
-| Other | excellent UI/UX; the PET screen-snapshot animation is especially polished | responses are noticeably worse here than when using the same OpenAI models through OpenCode or Claude Code; the harness itself produces weaker results despite the underlying model being capable |
+| UI / UX | excellent UI/UX; the PET screen-snapshot animation is especially polished | |
+| Ease of use | the PET screen-snapshot concept makes it easy to send visual context | |
+| Customizability | | |
+| Flexibility | | |
+| Speed / responsiveness | | |
+| Resource consumption | | |
+| Model support | | responses are noticeably worse here than when using the same OpenAI models through OpenCode or Claude Code; the harness itself produces weaker results despite the underlying model being capable |
+| Other | | |
 
 ### Cherry Studio
 
 | Aspect | Pros | Cons |
 |---|---|---|
-| Reasoning | | |
-| Coding | | |
-| Instruction-following | works as expected with custom system prompts for some models (e.g. GPT 5.6 Tera) | doesn't reliably deliver an injected system prompt to first-party Anthropic models; traced to the CLI proxy stripping the custom prompt and injecting its own, likely to avoid getting the account banned — a harness/proxy issue, not a model issue |
-| Tool use / agentic | initially fast with good results as a search assistant (Gemini 3.1 Flash) | doesn't surface third-party built-in search tools well to Claude models; Gemini 3.1 Flash hallucinated details as search assistant |
-| Context handling | | |
-| Speed / latency | | |
-| Cost / efficiency | | |
-| Refusals / safety behavior | | |
-| Formatting / output quality | | chat titles sometimes wrong, all caps, weird format; suspect backend issue |
-| Other | | unreliable chat-naming with some models; general fragility around system-prompt delivery to Anthropic models |
+| UI / UX | | chat titles sometimes wrong, all caps, weird format; suspect backend issue |
+| Ease of use | | unreliable chat-naming with some models |
+| Customizability | works as expected with custom system prompts for some models (e.g. GPT 5.6 Tera) | |
+| Flexibility | | doesn't surface third-party built-in search tools well to Claude models |
+| Speed / responsiveness | initially fast with good results as a search assistant (Gemini 3.1 Flash) | Gemini 3.1 Flash hallucinated details as search assistant |
+| Resource consumption | | |
+| Model support | | doesn't reliably deliver an injected system prompt to first-party Anthropic models; traced to the CLI proxy stripping the custom prompt and injecting its own, likely to avoid getting the account banned — a harness/proxy issue, not a model issue |
+| Other | | general fragility around system-prompt delivery to Anthropic models |
 
 ### OpenCode
 
 | Aspect | Pros | Cons |
 |---|---|---|
-| Reasoning | | |
-| Coding | | |
-| Instruction-following | | |
-| Tool use / agentic | with GPT 5.6 Tera, creates and works through a visible three-step todo list; workflow makes active model and todos clear | |
-| Context handling | | |
-| Speed / latency | | |
-| Cost / efficiency | | |
-| Refusals / safety behavior | | |
-| Formatting / output quality | | |
-| Other | pairing GPT 5.6 Tera with OpenCode seems like a strong workflow: model selection and created todos remain visible | |
+| UI / UX | with GPT 5.6 Tera, creates and works through a visible three-step todo list; workflow makes active model and todos clear | |
+| Ease of use | | |
+| Customizability | | |
+| Flexibility | | |
+| Speed / responsiveness | | |
+| Resource consumption | | |
+| Model support | strong pairing with GPT 5.6 Tera; model selection and created todos remain visible | |
+| Other | pairing GPT 5.6 Tera with OpenCode seems like a strong workflow | |

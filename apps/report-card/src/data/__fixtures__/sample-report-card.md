@@ -64,3 +64,20 @@ inside it may show up as a provider, a model, or a note.
 | Speed / latency             |                                        |                                     |
 | Formatting / output quality | transcribes unfamiliar names correctly | drops the final word on short clips |
 | Other                       | current voice-to-text model of choice  |                                     |
+
+---
+
+## LLM Harness
+
+### Fixture Harness
+
+| Aspect                 | Pros                              | Cons                          |
+| ---------------------- | --------------------------------- | ----------------------------- |
+| UI / UX                | clean, uncluttered layout         |                               |
+| Ease of use            |                                   | steep learning curve at first |
+| Customizability        | rich settings; scriptable         |                               |
+| Flexibility            |                                   |                               |
+| Speed / responsiveness | snappy on small projects          |                               |
+| Resource consumption   |                                   | memory-hungry on long runs    |
+| Model support          | works with every provider I tried |                               |
+| Other                  | daily driver                      |                               |

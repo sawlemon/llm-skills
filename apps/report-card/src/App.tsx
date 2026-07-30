@@ -12,7 +12,10 @@ export default function App() {
   const [selectedId, setSelectedId] = useHashModel();
 
   const results = useMemo(() => filterModels(reportCard.models, filters), [filters]);
-  const selected = reportCard.models.find((model) => model.id === selectedId) ?? null;
+  const selected =
+    reportCard.models.find((model) => model.id === selectedId) ??
+    reportCard.harnesses.find((harness) => harness.id === selectedId) ??
+    null;
 
   // A hash pointing at a model that no longer exists should not leave a dead URL.
   useEffect(() => {
@@ -40,6 +43,7 @@ export default function App() {
           <span className="nav__title">{reportCard.title}</span>
           <span className="nav__meta">
             {reportCard.models.length} models · {reportCard.providers.length} providers
+            {reportCard.harnesses.length > 0 ? ` · ${reportCard.harnesses.length} harnesses` : ''}
           </span>
         </div>
       </header>
@@ -88,6 +92,24 @@ export default function App() {
             ))
           )}
         </section>
+
+        {reportCard.harnesses.length > 0 ? (
+          <section className="gallery gallery--harness" aria-label="LLM harness gallery">
+            <div className="gallery__group">
+              <div className="gallery__section-head">
+                <h2 className="gallery__heading">LLM Harnesses</h2>
+                <p className="gallery__section-note">
+                  The apps and CLIs models run inside — judged on the harness itself, not the model.
+                </p>
+              </div>
+              <div className="gallery__grid">
+                {reportCard.harnesses.map((harness) => (
+                  <ModelCard key={harness.id} model={harness} highlightAspect={null} onSelect={setSelectedId} />
+                ))}
+              </div>
+            </div>
+          </section>
+        ) : null}
       </main>
 
       <footer className="footer">

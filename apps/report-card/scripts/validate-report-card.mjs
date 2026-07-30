@@ -46,5 +46,6 @@ const orderedCovered = card.aspects.filter((aspect) => covered.has(aspect));
 console.log(`LLM_REPORT_CARD.md is valid — "${card.title}"`);
 console.log(`  providers: ${card.providers.length} (${card.providers.map((p) => p.name).join(', ')})`);
 console.log(`  models:    ${card.models.length}`);
+console.log(`  harnesses: ${card.harnesses.length} (${card.harnesses.map((h) => h.name).join(', ')})`);
 console.log(`  aspects:   ${orderedCovered.length} of ${card.aspects.length} with observations`);
 console.log(`  notes:     ${pros} pros, ${cons} cons`);

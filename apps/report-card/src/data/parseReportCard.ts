@@ -1,5 +1,7 @@
 import {
   CANONICAL_ASPECTS,
+  HARNESS_ASPECTS,
+  HARNESS_SECTION_NAME,
   ReportCardParseError,
   type AspectEntry,
   type ModelEntry,
@@ -9,12 +11,29 @@ import {
 
 const EXPECTED_COLUMNS = ['aspect', 'pros', 'cons'];
 
-const CANONICAL_ASPECT_SET: ReadonlySet<string> = new Set(CANONICAL_ASPECTS);
+/**
+ * The two vocabularies a table may use, chosen by the enclosing section: model sections use
+ * {@link CANONICAL_ASPECTS}, and the reserved {@link HARNESS_SECTION_NAME} section uses
+ * {@link HARNESS_ASPECTS}. Each entry carries the set (for membership) and a loose-key map
+ * (for near-miss suggestions), plus the ordered list for the "expected one of ..." message.
+ */
+const ASPECT_VOCABULARIES = {
+  model: buildVocabulary(CANONICAL_ASPECTS),
+  harness: buildVocabulary(HARNESS_ASPECTS),
+} as const;
 
-/** Canonical aspects keyed by their loose form, for suggesting a fix on a near miss. */
-const ASPECTS_BY_LOOSE_KEY: ReadonlyMap<string, string> = new Map(
-  CANONICAL_ASPECTS.map((aspect) => [looseAspectKey(aspect), aspect]),
-);
+type SectionKind = keyof typeof ASPECT_VOCABULARIES;
+
+function buildVocabulary(aspects: readonly string[]) {
+  return {
+    ordered: aspects,
+    set: new Set(aspects) as ReadonlySet<string>,
+    byLooseKey: new Map(aspects.map((aspect) => [looseAspectKey(aspect), aspect])) as ReadonlyMap<
+      string,
+      string
+    >,
+  };
+}
 
 /** Folds case and drops all whitespace, so "Tool use/agentic" keys the same as "Tool use / agentic". */
 function looseAspectKey(aspect: string): string {
@@ -112,11 +131,16 @@ export function splitNotes(cell: string): string[] {
  * Builds the error for an aspect name that is not in `CANONICAL_ASPECTS`, pointing at the
  * closest canonical name when the difference is only case or whitespace.
  */
-function unknownAspectError(aspect: string, modelName: string, line: number): ReportCardParseError {
-  const suggestion = ASPECTS_BY_LOOSE_KEY.get(looseAspectKey(aspect));
+function unknownAspectError(
+  aspect: string,
+  modelName: string,
+  line: number,
+  vocabulary: (typeof ASPECT_VOCABULARIES)[SectionKind],
+): ReportCardParseError {
+  const suggestion = vocabulary.byLooseKey.get(looseAspectKey(aspect));
   const fix = suggestion
     ? `did you mean "${suggestion}"?`
-    : `expected one of [${CANONICAL_ASPECTS.join(', ')}]`;
+    : `expected one of [${vocabulary.ordered.join(', ')}]`;
   return new ReportCardParseError(`model "${modelName}" has unknown aspect "${aspect}"; ${fix}`, line);
 }
 
@@ -126,10 +150,14 @@ export function parseReportCard(markdown: string): ReportCard {
   let title = 'LLM Report Card';
   const providers: ProviderEntry[] = [];
   const models: ModelEntry[] = [];
+  const harnesses: ModelEntry[] = [];
   const seenAspects = new Set<string>();
+  const seenHarnessAspects = new Set<string>();
   const seenModelIds = new Set<string>();
 
   let provider: ProviderEntry | null = null;
+  // 'model' while under a "## Provider" heading, 'harness' under the reserved "## LLM Harness".
+  let sectionKind: SectionKind = 'model';
   let model: ModelEntry | null = null;
   let modelLine = 0;
   let inTable = false;
@@ -157,40 +185,68 @@ export function parseReportCard(markdown: string): ReportCard {
       if (level === 1) {
         finishModel();
         provider = null;
+        sectionKind = 'model';
         title = name;
       } else if (level === 2) {
         finishModel();
-        provider = { id: slugify(name), name, models: [] };
+        if (name === HARNESS_SECTION_NAME) {
+          // A flat section of harness tools, not a provider grouping models.
+          sectionKind = 'harness';
+          provider = null;
+        } else {
+          sectionKind = 'model';
+          provider = { id: slugify(name), name, models: [] };
+        }
       } else if (level === 3) {
         finishModel();
-        if (!provider) {
-          throw new ReportCardParseError(
-            `model "${name}" appears before any provider heading; add a "## Provider" heading above it`,
-            number,
-          );
+        if (sectionKind === 'harness') {
+          const id = `harness--${slugify(name)}`;
+          if (seenModelIds.has(id)) {
+            throw new ReportCardParseError(`duplicate harness "${name}"`, number);
+          }
+          seenModelIds.add(id);
+          model = {
+            id,
+            name,
+            provider: HARNESS_SECTION_NAME,
+            providerId: 'harness',
+            aspects: [],
+            coveredAspects: [],
+            prosCount: 0,
+            consCount: 0,
+          };
+          modelLine = number;
+          harnesses.push(model);
+        } else {
+          if (!provider) {
+            throw new ReportCardParseError(
+              `model "${name}" appears before any provider heading; add a "## Provider" heading above it`,
+              number,
+            );
+          }
+          const id = `${provider.id}--${slugify(name)}`;
+          if (seenModelIds.has(id)) {
+            throw new ReportCardParseError(
+              `duplicate model "${name}" under provider "${provider.name}"`,
+              number,
+            );
+          }
+          seenModelIds.add(id);
+          model = {
+            id,
+            name,
+            provider: provider.name,
+            providerId: provider.id,
+            aspects: [],
+            coveredAspects: [],
+            prosCount: 0,
+            consCount: 0,
+          };
+          modelLine = number;
+          if (!providers.includes(provider)) providers.push(provider);
+          provider.models.push(model);
+          models.push(model);
         }
-        const id = `${provider.id}--${slugify(name)}`;
-        if (seenModelIds.has(id)) {
-          throw new ReportCardParseError(
-            `duplicate model "${name}" under provider "${provider.name}"`,
-            number,
-          );
-        }
-        seenModelIds.add(id);
-        model = {
-          id,
-          name,
-          provider: provider.name,
-          providerId: provider.id,
-          aspects: [],
-          coveredAspects: [],
-          prosCount: 0,
-          consCount: 0,
-        };
-        modelLine = number;
-        if (!providers.includes(provider)) providers.push(provider);
-        provider.models.push(model);
-        models.push(model);
       }
       continue;
     }
@@ -234,8 +290,9 @@ export function parseReportCard(markdown: string): ReportCard {
     if (!aspect) {
       throw new ReportCardParseError(`model "${model.name}" has a row with an empty Aspect`, number);
     }
-    if (!CANONICAL_ASPECT_SET.has(aspect)) {
-      throw unknownAspectError(aspect, model.name, number);
+    const vocabulary = ASPECT_VOCABULARIES[sectionKind];
+    if (!vocabulary.set.has(aspect)) {
+      throw unknownAspectError(aspect, model.name, number, vocabulary);
     }
 
     const entry: AspectEntry = {
@@ -248,7 +305,7 @@ export function parseReportCard(markdown: string): ReportCard {
     model.prosCount += entry.pros.length;
     model.consCount += entry.cons.length;
     if (entry.pros.length || entry.cons.length) model.coveredAspects.push(aspect);
-    seenAspects.add(aspect);
+    (sectionKind === 'harness' ? seenHarnessAspects : seenAspects).add(aspect);
   }
 
   finishModel();
@@ -262,6 +319,7 @@ export function parseReportCard(markdown: string): ReportCard {
 
   // Present aspects in canonical order regardless of authoring order, keeping only those used.
   const aspects = CANONICAL_ASPECTS.filter((aspect) => seenAspects.has(aspect));
+  const harnessAspects = HARNESS_ASPECTS.filter((aspect) => seenHarnessAspects.has(aspect));
 
-  return { title, providers, models, aspects };
+  return { title, providers, models, aspects, harnesses, harnessAspects };
 }

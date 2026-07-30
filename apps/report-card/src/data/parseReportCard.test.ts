@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { parseReportCard, splitNotes, slugify } from './parseReportCard';
-import { CANONICAL_ASPECTS, ReportCardParseError } from './types';
+import { CANONICAL_ASPECTS, HARNESS_ASPECTS, ReportCardParseError } from './types';
 import { fixtureCard, fixtureModel } from './__fixtures__/fixtureCard';
 
 const realSource = readFileSync(resolve(__dirname, '../../../../LLM_REPORT_CARD.md'), 'utf8');
@@ -120,6 +120,22 @@ describe('parseReportCard on the fixture document', () => {
     expect(model.prosCount).toBe(0);
     expect(model.consCount).toBe(0);
   });
+
+  it('collects harnesses separately from models, out of the provider list', () => {
+    expect(card.harnesses.map((harness) => harness.name)).toEqual(['Fixture Harness']);
+    expect(card.models.map((model) => model.name)).not.toContain('Fixture Harness');
+    expect(card.providers.map((provider) => provider.name)).not.toContain('LLM Harness');
+  });
+
+  it('gives harnesses their own aspect vocabulary and provider-scoped ids', () => {
+    const harness = card.harnesses[0];
+    expect(harness.id).toBe('harness--fixture-harness');
+    expect(harness.provider).toBe('LLM Harness');
+    expect(harness.aspects.map((entry) => entry.aspect)).toEqual([...HARNESS_ASPECTS]);
+    expect(card.harnessAspects).toEqual([...HARNESS_ASPECTS]);
+    expect(harness.prosCount).toBe(6);
+    expect(harness.consCount).toBe(2);
+  });
 });
 
 /**
@@ -218,6 +234,33 @@ describe('parseReportCard validation', () => {
     expect(() => parseReportCard(`# Card\n\n## Acme\n\n### Model X\n\n${invented}\n`)).toThrow(
       `model "Model X" has unknown aspect "Vibes"; expected one of [${CANONICAL_ASPECTS.join(', ')}]`,
     );
+  });
+
+  it('accepts a harness table using the harness aspect vocabulary', () => {
+    const harnessTable = ['| Aspect | Pros | Cons |', '|---|---|---|', '| UI / UX | clean | |'].join('\n');
+    const card = parseReportCard(`# Card\n\n## Acme\n\n### Model X\n\n${table}\n\n## LLM Harness\n\n### Tool Y\n\n${harnessTable}\n`);
+    expect(card.harnesses.map((h) => h.name)).toEqual(['Tool Y']);
+    expect(card.harnesses[0].aspects[0].aspect).toBe('UI / UX');
+  });
+
+  it('rejects a model aspect inside a harness table', () => {
+    const harnessTable = ['| Aspect | Pros | Cons |', '|---|---|---|', '| Reasoning | good | |'].join('\n');
+    expect(() =>
+      parseReportCard(`# Card\n\n## Acme\n\n### Model X\n\n${table}\n\n## LLM Harness\n\n### Tool Y\n\n${harnessTable}\n`),
+    ).toThrow(new RegExp(`unknown aspect "Reasoning"; expected one of \\[${HARNESS_ASPECTS.join(', ')}\\]`));
+  });
+
+  it('rejects a harness aspect inside a model table', () => {
+    const wrong = ['| Aspect | Pros | Cons |', '|---|---|---|', '| UI / UX | clean | |'].join('\n');
+    expect(() => parseReportCard(`# Card\n\n## Acme\n\n### Model X\n\n${wrong}\n`)).toThrow(
+      /unknown aspect "UI \/ UX"/,
+    );
+  });
+
+  it('rejects duplicate harnesses', () => {
+    const harnessTable = ['| Aspect | Pros | Cons |', '|---|---|---|', '| UI / UX | clean | |'].join('\n');
+    const doc = `# Card\n\n## Acme\n\n### Model X\n\n${table}\n\n## LLM Harness\n\n### Tool Y\n\n${harnessTable}\n\n### Tool Y\n\n${harnessTable}\n`;
+    expect(() => parseReportCard(doc)).toThrow(/duplicate harness "Tool Y"/);
   });
 
   it('returns card aspects in canonical order while model rows keep source order', () => {

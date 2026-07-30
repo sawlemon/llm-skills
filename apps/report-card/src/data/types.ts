@@ -21,6 +21,30 @@ export const CANONICAL_ASPECTS = [
 /** One of the {@link CANONICAL_ASPECTS} names. */
 export type CanonicalAspect = (typeof CANONICAL_ASPECTS)[number];
 
+/**
+ * The aspect names an LLM harness table may use, in display order.
+ *
+ * Harnesses (Claude Code, ChatGPT desktop, Cherry Studio, ...) are the tools models run inside,
+ * so they are judged on different things than the models themselves. They live under the reserved
+ * `## LLM Harness` heading and use this set instead of {@link CANONICAL_ASPECTS}.
+ */
+export const HARNESS_ASPECTS = [
+  'UI / UX',
+  'Ease of use',
+  'Customizability',
+  'Flexibility',
+  'Speed / responsiveness',
+  'Resource consumption',
+  'Model support',
+  'Other',
+] as const;
+
+/** One of the {@link HARNESS_ASPECTS} names. */
+export type HarnessAspect = (typeof HARNESS_ASPECTS)[number];
+
+/** The exact top-level heading that switches a section from models to harnesses. */
+export const HARNESS_SECTION_NAME = 'LLM Harness';
+
 export interface AspectEntry {
   /** Aspect name, always one of {@link CANONICAL_ASPECTS}, e.g. "Tool use / agentic". */
   aspect: string;
@@ -59,8 +83,12 @@ export interface ReportCard {
   providers: ProviderEntry[];
   /** All models, flattened in source order. */
   models: ModelEntry[];
-  /** Every distinct aspect name seen, in {@link CANONICAL_ASPECTS} order. */
+  /** Every distinct aspect name seen across models, in {@link CANONICAL_ASPECTS} order. */
   aspects: string[];
+  /** Harness tools listed under the reserved "## LLM Harness" heading, in source order. */
+  harnesses: ModelEntry[];
+  /** Every distinct aspect name seen across harnesses, in {@link HARNESS_ASPECTS} order. */
+  harnessAspects: string[];
 }
 
 export class ReportCardParseError extends Error {

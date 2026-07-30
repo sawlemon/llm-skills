@@ -316,6 +316,25 @@ main {
   gap: 16px;
 }
 
+.gallery--harness {
+  padding-top: 8px;
+  border-top: 1px solid var(--hairline);
+}
+
+.gallery__section-head {
+  margin-bottom: 16px;
+}
+
+.gallery__section-head .gallery__heading {
+  margin-bottom: 4px;
+}
+
+.gallery__section-note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-secondary);
+}
+
 .model-card {
   display: flex;
   flex-direction: column;
