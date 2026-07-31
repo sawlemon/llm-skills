@@ -171,7 +171,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Tool use / agentic | excellent tool calling; reliably picks right tools; with CC Switch routing Codex desktop messages to it, handled the full edit-and-push workflow for this report card | integration reached a point where providers could be listed but nothing was usable, so the whole thing was reverted; asked to run the Raindrop extraction Python file, ran it without checking the existing JSON tracker and re-extracted all bookmarks |
 | Context handling | | |
 | Speed / latency | one of fastest models used so far; finished the whole integration task within 15 minutes | |
-| Cost / efficiency | ran quite a few tasks on medium settings for about $0.18, so incredibly cheap | |
+| Cost / efficiency | ran quite a few tasks on medium settings for about $0.18, mind-blowingly cheap; OpenRouter usage dashboard showed $0.12 spend for 182 requests / 8.57M tokens in 3 hours, a blended $0.01/1M tokens with 94.1% cache hit rate | |
 | Refusals / safety behavior | | |
 | Formatting / output quality | | |
 | Other | favorite quick model; despite reported high hallucination rate, does not hallucinate much in practice and sticks to task; handled the Hill Climb scheduled task on medium settings by getting the transcript accurately and updating it | no vision support or native image inputs; initial criticism of complex-task performance softened — Opus 5 also failed the same custom ChatGPT-app integration, so verdict still open on whether any model can do it yet |
