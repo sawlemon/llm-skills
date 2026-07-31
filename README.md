@@ -16,6 +16,7 @@ Two things live here:
 LLM_REPORT_CARD.md          single source of truth for the site (stays at the repo root)
 skills/
   alfred/SKILL.md
+  hill-climb/SKILL.md
   hinsighter/SKILL.md
   search/SKILL.md
 apps/
@@ -32,6 +33,11 @@ Point a tool's system prompt at a `skills/*/SKILL.md` file to apply that behavio
   `career`, `finances`, `work`, `default`), keep output concise and free of preamble, and stay
   epistemically honest — search before guessing, label speculation, and say "I don't know" when that is
   the truthful answer.
+- **`hill-climb/`** — daily Claude Code learning-extraction persona. Audits session transcripts from the
+  last 24 hours under `~/Downloads/Personal` or `~/Downloads/Work` and merges durable, gated, evidenced
+  learnings into a global memory structure: a small always-on map (`~/.claude/CLAUDE.md`, capped at 100
+  lines) plus a system-of-record `~/.claude/docs/` tree it points into. No quota — an empty run with
+  nothing durable found is a correct outcome.
 - **`hinsighter/`** — the detailed operating protocol for the Hindsight MCP memory server. Documents the
   tool surface (`memoryRecall`, `memoryRetain`, `memorySyncRetain`, `memoryReflect`), the required
   `bank_id` on every call, bank definitions, decision gates for _should I recall / reflect / retain_,
