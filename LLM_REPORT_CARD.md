@@ -167,14 +167,14 @@ For each model, keep a running list of observations under each aspect — short 
 |---|---|---|---|
 | Reasoning | | on custom ChatGPT-app provider integration (planned with Opus 4.8, executed here) made many mistakes and left a few old references behind; that said, Opus 5 failed the same task too — likely a hard/unsolvable task rather than a model-specific failure |
 | Coding | | same integration task: did not perform well, made lots of mistakes, left old references |
-| Instruction-following | adheres to system prompt consistently on every turn | |
+| Instruction-following | adheres to system prompt consistently on every turn; gets things done in a neat way when prompted directly | needs a direct prompt; doesn't reliably infer implicit intent on its own; initially said it had not read the raindrop_tract session, then gave the right answer after a more specific follow-up |
 | Tool use / agentic | excellent tool calling; reliably picks right tools; with CC Switch routing Codex desktop messages to it, handled the full edit-and-push workflow for this report card | integration reached a point where providers could be listed but nothing was usable, so the whole thing was reverted; asked to run the Raindrop extraction Python file, ran it without checking the existing JSON tracker and re-extracted all bookmarks |
 | Context handling | | |
 | Speed / latency | one of fastest models used so far; finished the whole integration task within 15 minutes | |
-| Cost / efficiency | | |
+| Cost / efficiency | ran quite a few tasks on medium settings for about $0.18, so incredibly cheap | |
 | Refusals / safety behavior | | |
 | Formatting / output quality | | |
-| Other | favorite quick model; despite reported high hallucination rate, does not hallucinate much in practice and sticks to task | no vision support or native image inputs; initial criticism of complex-task performance softened — Opus 5 also failed the same custom ChatGPT-app integration, so verdict still open on whether any model can do it yet |
+| Other | favorite quick model; despite reported high hallucination rate, does not hallucinate much in practice and sticks to task; handled the Hill Climb scheduled task on medium settings by getting the transcript accurately and updating it | no vision support or native image inputs; initial criticism of complex-task performance softened — Opus 5 also failed the same custom ChatGPT-app integration, so verdict still open on whether any model can do it yet |
 
 ---
 
