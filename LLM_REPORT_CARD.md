@@ -78,7 +78,7 @@ For each model, keep a running list of observations under each aspect — short 
 
 | Aspect | Pros | Cons |
 |---|---|---|
-| Reasoning | researched CLI proxy issue without source code and correctly traced it to proxy stripping custom prompt, setting Claude Code-style header, and injecting its own agent prompt; correctly concluded Cherry Studio was not problem | failed to identify separate session's memory deletion as cause of missing Hindsight observations; instead gave false explanation; reasoning sometimes misses facts and relies on wrong assumptions |
+| Reasoning | researched CLI proxy issue without source code and correctly traced it to proxy stripping custom prompt, setting Claude Code-style header, and injecting its own agent prompt; correctly concluded Cherry Studio was not problem; researched a GitHub Actions/PR sign-in issue and suggested logout/login even though the user was already signed in, which did fix it | failed to identify separate session's memory deletion as cause of missing Hindsight observations; instead gave false explanation; reasoning sometimes misses facts and relies on wrong assumptions |
 | Coding | same OpenCode variant-selection debug task that MiMo 2.5 failed: solved it, though tried many approaches that did not work and were out of scope before landing the fix | |
 | Instruction-following | follows every instruction and remembers earlier instructions in same initial prompt | outside first-party tools, does not reliably receive injected custom prompt; proxy strips it and injects its own system prompt |
 | Tool use / agentic | performed requested Hindsight recall correctly and concisely; spawned two agents that identified CLI proxy root cause; thorough Hindsight memory management, including URL expansion and collateral-damage checks; independently found and surfaced separate bug for future conversation | even in auto mode, sometimes asks user to run shell commands or confirm continuation instead of executing; may need `/goal` more often |
@@ -168,7 +168,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Reasoning | | on custom ChatGPT-app provider integration (planned with Opus 4.8, executed here) made many mistakes and left a few old references behind; that said, Opus 5 failed the same task too — likely a hard/unsolvable task rather than a model-specific failure |
 | Coding | | same integration task: did not perform well, made lots of mistakes, left old references |
 | Instruction-following | adheres to system prompt consistently on every turn | |
-| Tool use / agentic | excellent tool calling; reliably picks right tools | integration reached a point where providers could be listed but nothing was usable, so the whole thing was reverted |
+| Tool use / agentic | excellent tool calling; reliably picks right tools; with CC Switch routing Codex desktop messages to it, handled the full edit-and-push workflow for this report card | integration reached a point where providers could be listed but nothing was usable, so the whole thing was reverted |
 | Context handling | | |
 | Speed / latency | one of fastest models used so far; finished the whole integration task within 15 minutes | |
 | Cost / efficiency | | |
@@ -356,3 +356,16 @@ Harnesses are the apps/CLIs that models run inside. They're judged on different 
 | Resource consumption | | |
 | Model support | strong pairing with GPT 5.6 Tera; model selection and created todos remain visible | |
 | Other | pairing GPT 5.6 Tera with OpenCode seems like a strong workflow | |
+
+### CC Switch
+
+| Aspect | Pros | Cons |
+|---|---|---|
+| UI / UX | small router switcher in the Codex desktop app for choosing which model receives the task | |
+| Ease of use | quick to configure; first route to DeepSeek V4 Flash worked end to end | |
+| Customizability | lets you modify the desktop-app router, so messages can go to non-native models | |
+| Flexibility | opened up Codex desktop to DeepSeek V4 Flash for the current task | |
+| Speed / responsiveness | | |
+| Resource consumption | | |
+| Model support | successfully routed Codex desktop messages to DeepSeek V4 Flash | |
+| Other | | new setup; needs more testing before a broader verdict |
