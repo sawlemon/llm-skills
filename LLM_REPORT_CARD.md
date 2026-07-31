@@ -87,7 +87,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Cost / efficiency | | CLI proxy investigation with two agents consumed roughly 30% of usage for one question; token-hungry, though less so than Fable 5; close to $90 worth of tokens spent on a documentation task via Claude Code desktop app |
 | Refusals / safety behavior | | |
 | Formatting / output quality | markdown documentation output via Claude Code desktop app was spot-on, well-formatted, and unprompted included a visual diagram representation | often emits multiple long paragraphs requiring reading and filtering instead of concise task-focused output |
-| Other | impressive investigative/root-cause diagnosis; self-admits mistakes and addresses them later — without that self-admission there'd be no way to know it erred in the first place; on same documentation prompt/project, output via Claude Code desktop app was clearly better than Opus 4.8 via Claude Code, suggesting the desktop app may be stronger for documentation tasks | overall consensus (past early-impression phase): not that good; gave two wrong answers then corrected itself later; makes noticeably more mistakes than Opus 4.8 and self-corrects after rather than getting it right first time; Twitter discussion also includes substantial user dissatisfaction despite strong benchmark scores, with reports that it makes frequent mistakes and takes autonomous actions users did not request |
+| Other | impressive investigative/root-cause diagnosis; self-admits mistakes and addresses them later — without that self-admission there'd be no way to know it erred in the first place; on same documentation prompt/project, output via Claude Code desktop app was clearly better than Opus 4.8 via Claude Code, suggesting the desktop app may be stronger for documentation tasks | overall consensus (past early-impression phase): not that good; gave two wrong answers then corrected itself later; makes noticeably more mistakes than Opus 4.8 and self-corrects after rather than getting it right first time; Twitter discussion also includes substantial user dissatisfaction despite strong benchmark scores, with reports that it makes frequent mistakes and takes autonomous actions users did not request; on the custom ChatGPT-app provider integration task, claimed completion after using ~20% of a Fire session, but the ChatGPT app had no custom models listed — it fabricated success rather than admitting failure (same task DeepSeek V4 Flash also failed) |
 
 ---
 
@@ -165,7 +165,7 @@ For each model, keep a running list of observations under each aspect — short 
 
 | Aspect | Pros | Cons |
 |---|---|---|---|
-| Reasoning | | benchmarks over-promise; on custom ChatGPT-app provider integration (planned with Opus 4.8, executed here) made many mistakes and left a few old references behind |
+| Reasoning | | on custom ChatGPT-app provider integration (planned with Opus 4.8, executed here) made many mistakes and left a few old references behind; that said, Opus 5 failed the same task too — likely a hard/unsolvable task rather than a model-specific failure |
 | Coding | | same integration task: did not perform well, made lots of mistakes, left old references |
 | Instruction-following | adheres to system prompt consistently on every turn | |
 | Tool use / agentic | excellent tool calling; reliably picks right tools | integration reached a point where providers could be listed but nothing was usable, so the whole thing was reverted |
@@ -174,7 +174,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Cost / efficiency | | |
 | Refusals / safety behavior | | |
 | Formatting / output quality | | |
-| Other | favorite quick model; despite reported high hallucination rate, does not hallucinate much in practice and sticks to task | no vision support or native image inputs; complicated tasks it completes fast but poorly — good speed, unreliable execution on complex work |
+| Other | favorite quick model; despite reported high hallucination rate, does not hallucinate much in practice and sticks to task | no vision support or native image inputs; initial criticism of complex-task performance softened — Opus 5 also failed the same custom ChatGPT-app integration, so verdict still open on whether any model can do it yet |
 
 ---
 
