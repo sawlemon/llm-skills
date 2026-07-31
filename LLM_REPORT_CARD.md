@@ -164,17 +164,17 @@ For each model, keep a running list of observations under each aspect — short 
 ### DeepSeek V4 Flash
 
 | Aspect | Pros | Cons |
-|---|---|---|
-| Reasoning | | |
-| Coding | | |
+|---|---|---|---|
+| Reasoning | | benchmarks over-promise; on custom ChatGPT-app provider integration (planned with Opus 4.8, executed here) made many mistakes and left a few old references behind |
+| Coding | | same integration task: did not perform well, made lots of mistakes, left old references |
 | Instruction-following | adheres to system prompt consistently on every turn | |
-| Tool use / agentic | excellent tool calling; reliably picks right tools | |
+| Tool use / agentic | excellent tool calling; reliably picks right tools | integration reached a point where providers could be listed but nothing was usable, so the whole thing was reverted |
 | Context handling | | |
-| Speed / latency | one of fastest models used so far | |
+| Speed / latency | one of fastest models used so far; finished the whole integration task within 15 minutes | |
 | Cost / efficiency | | |
 | Refusals / safety behavior | | |
 | Formatting / output quality | | |
-| Other | favorite quick model; despite reported high hallucination rate, does not hallucinate much in practice and sticks to task | no vision support or native image inputs |
+| Other | favorite quick model; despite reported high hallucination rate, does not hallucinate much in practice and sticks to task | no vision support or native image inputs; complicated tasks it completes fast but poorly — good speed, unreliable execution on complex work |
 
 ---
 
@@ -324,7 +324,7 @@ Harnesses are the apps/CLIs that models run inside. They're judged on different 
 |---|---|---|
 | UI / UX | excellent UI/UX; the PET screen-snapshot animation is especially polished | |
 | Ease of use | the PET screen-snapshot concept makes it easy to send visual context | |
-| Customizability | | |
+| Customizability | third-party tooling ("better chat GPT" style) allows pointing the app at custom providers/models; DeepSeek V4 Flash integration ran, but output was unusable and had to be reverted | |
 | Flexibility | | |
 | Speed / responsiveness | | |
 | Resource consumption | | |
