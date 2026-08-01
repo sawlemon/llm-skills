@@ -393,9 +393,9 @@ Harnesses are the apps/CLIs that models run inside. They're judged on different 
 |---|---|---|
 | UI / UX | small router switcher in the Codex desktop app for choosing which model receives the task | |
 | Ease of use | quick to configure; first route to DeepSeek V4 Flash worked end to end | |
-| Customizability | lets you modify the desktop-app router, so messages can go to non-native models | |
+| Customizability | lets you modify the desktop-app router, so messages can go to non-native models | no way to choose thinking/reasoning effort per model — always defaults to high for every routed model, which sometimes just burns extra tokens; would rather run a frontier model at low effort, but that control isn't exposed, so it's a compromise to accept |
 | Flexibility | opened up Codex desktop to DeepSeek V4 Flash for the current task; supports image input — pasted a screenshot while routed to Claude Sonnet 5 and it correctly recognized the image contents | |
 | Speed / responsiveness | | |
 | Resource consumption | | |
-| Model support | successfully routed Codex desktop messages to DeepSeek V4 Flash | |
+| Model support | successfully routed Codex desktop messages to DeepSeek V4 Flash; switching the upstream format for Anthropic models from Chat Completions to Responses (native) fixed tool use and enabled spawning sub-agents in Codex — Chat Completions as upstream caused errors and blocked both tool use and sub-agent spawning for Anthropic models | |
 | Other | | new setup; needs more testing before a broader verdict; cloud models routed through CC Switch can be troublesome on advanced tasks — a long-horizon task appeared to get stuck thinking, with the last command repeatedly shown while the thinking view was expanded; possibly a UI or streaming-response issue, but tool calling is not consistently smooth |
