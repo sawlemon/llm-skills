@@ -282,7 +282,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Formatting / output quality | does not force-capitalize words that should be acronyms (e.g. "LLM" stays lowercase as typed), feels more like natural human typing | |
 | Other | testing well so far; disadvantage is lack of streaming/live transcription | |
 
-### NVIDIA Streaming 3.5
+### Nemotron Streaming 3.5
 
 | Aspect | Pros | Cons |
 |---|---|---|
@@ -292,7 +292,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Tool use / agentic | | |
 | Context handling | supports live/streaming transcription — a nice-to-have not realized was needed until offered | |
 | Speed / latency | very fast | |
-| Cost / efficiency | | |
+| Cost / efficiency | ~716 MB on disk, roughly the same size as Parakeet Unified EN 0.6B (~697 MB) and Parakeet TDT 0.6B v2 (~695 MB) | |
 | Refusals / safety behavior | | |
 | Formatting / output quality | picks up words reliably overall | bad at picking up single words, especially Tamil names |
 | Other | works fine so far; terrible model name | |
@@ -394,7 +394,7 @@ Harnesses are the apps/CLIs that models run inside. They're judged on different 
 | UI / UX | small router switcher in the Codex desktop app for choosing which model receives the task | |
 | Ease of use | quick to configure; first route to DeepSeek V4 Flash worked end to end | |
 | Customizability | lets you modify the desktop-app router, so messages can go to non-native models | |
-| Flexibility | opened up Codex desktop to DeepSeek V4 Flash for the current task | |
+| Flexibility | opened up Codex desktop to DeepSeek V4 Flash for the current task; supports image input — pasted a screenshot while routed to Claude Sonnet 5 and it correctly recognized the image contents | |
 | Speed / responsiveness | | |
 | Resource consumption | | |
 | Model support | successfully routed Codex desktop messages to DeepSeek V4 Flash | |
