@@ -264,8 +264,38 @@ For each model, keep a running list of observations under each aspect — short 
 | Speed / latency | | |
 | Cost / efficiency | | |
 | Refusals / safety behavior | | |
-| Formatting / output quality | very accurate live transcription; correctly recognized colleagues' Tamil names mid-sentence | |
-| Other | current voice-to-text model of choice; live performance impressive | |
+| Formatting / output quality | very accurate live transcription; correctly recognized colleagues' Tamil names mid-sentence | recognition accuracy degrading lately; misses the word "Deepseek" specifically until added as a custom word in Handy app, after which it works |
+| Other | current voice-to-text model of choice; live performance impressive | overall experience degrading vs. earlier — needed custom vocabulary (Handy app) to fix specific word misses |
+
+### Parakeet TDT V2
+
+| Aspect | Pros | Cons |
+|---|---|---|
+| Reasoning | | |
+| Coding | | |
+| Instruction-following | | |
+| Tool use / agentic | | |
+| Context handling | not a streaming model, so no live transcript view | |
+| Speed / latency | | |
+| Cost / efficiency | | |
+| Refusals / safety behavior | | |
+| Formatting / output quality | does not force-capitalize words that should be acronyms (e.g. "LLM" stays lowercase as typed), feels more like natural human typing | |
+| Other | testing well so far; disadvantage is lack of streaming/live transcription | |
+
+### NVIDIA Streaming 3.5
+
+| Aspect | Pros | Cons |
+|---|---|---|
+| Reasoning | | |
+| Coding | | |
+| Instruction-following | | |
+| Tool use / agentic | | |
+| Context handling | supports live/streaming transcription — a nice-to-have not realized was needed until offered | |
+| Speed / latency | very fast | |
+| Cost / efficiency | | |
+| Refusals / safety behavior | | |
+| Formatting / output quality | picks up words reliably overall | bad at picking up single words, especially Tamil names |
+| Other | works fine so far; terrible model name | |
 
 ---
 
