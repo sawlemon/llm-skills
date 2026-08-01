@@ -33,11 +33,14 @@ Point a tool's system prompt at a `skills/*/SKILL.md` file to apply that behavio
   `career`, `finances`, `work`, `default`), keep output concise and free of preamble, and stay
   epistemically honest — search before guessing, label speculation, and say "I don't know" when that is
   the truthful answer.
-- **`hill-climb/`** — daily Claude Code learning-extraction persona. Audits session transcripts from the
-  last 24 hours under `~/Downloads/Personal` or `~/Downloads/Work` and merges durable, gated, evidenced
-  learnings into a global memory structure: a small always-on map (`~/.claude/CLAUDE.md`, capped at 100
-  lines) plus a system-of-record `~/.claude/docs/` tree it points into. No quota — an empty run with
-  nothing durable found is a correct outcome.
+- **`hill-climb/`** — daily learning-extraction personas.
+  - `daily-claude-to-codex-learning-extraction.md` — audits Claude Code session transcripts
+    (`~/.claude/projects/**`) and merges durable, gated, evidenced learnings into a small always-on map
+    (`~/.codex/AGENTS.md`, capped at 100 lines) plus a system-of-record `~/.codex/docs/` tree. No quota —
+    an empty run with nothing durable found is a correct outcome.
+  - `daily-codex-learning-extraction.md` — the Codex-specific self-learning variant: audits **Codex**
+    session transcripts (`~/.codex/sessions/**`) directly, reading each session's project `cwd` from its
+    `session_meta` line and writing to the same `~/.codex/AGENTS.md` map + `~/.codex/docs/` tree.
 - **`hinsighter/`** — the detailed operating protocol for the Hindsight MCP memory server. Documents the
   tool surface (`memoryRecall`, `memoryRetain`, `memorySyncRetain`, `memoryReflect`), the required
   `bank_id` on every call, bank definitions, decision gates for _should I recall / reflect / retain_,
