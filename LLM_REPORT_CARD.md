@@ -295,7 +295,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Cost / efficiency | ~716 MB on disk, roughly the same size as Parakeet Unified EN 0.6B (~697 MB) and Parakeet TDT 0.6B v2 (~695 MB) | |
 | Refusals / safety behavior | | |
 | Formatting / output quality | picks up words reliably overall | bad at picking up single words, especially Tamil names |
-| Other | works fine so far; terrible model name | |
+| Other | works fine so far | mistook English speech for Hindi and transcribed the whole thing in Hindi instead |
 
 ---
 
@@ -398,4 +398,4 @@ Harnesses are the apps/CLIs that models run inside. They're judged on different 
 | Speed / responsiveness | | |
 | Resource consumption | | |
 | Model support | successfully routed Codex desktop messages to DeepSeek V4 Flash | |
-| Other | | new setup; needs more testing before a broader verdict |
+| Other | | new setup; needs more testing before a broader verdict; cloud models routed through CC Switch can be troublesome on advanced tasks — a long-horizon task appeared to get stuck thinking, with the last command repeatedly shown while the thinking view was expanded; possibly a UI or streaming-response issue, but tool calling is not consistently smooth |
