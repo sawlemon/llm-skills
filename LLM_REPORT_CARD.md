@@ -105,7 +105,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Speed / latency | extremely fast for quick, small tasks | |
 | Cost / efficiency | | |
 | Refusals / safety behavior | | |
-| Formatting / output quality | | |
+| Formatting / output quality | wrote an OLX ad description via Cherry Studio that was bang on — one of the best LLM responses to a request in a while; Hindsight memory context likely helped | |
 | Other | pairing GPT 5.6 Tera with OpenCode seems like a strong workflow: model selection and created todos remain visible; ChatGPT desktop app has excellent UI/UX, and the PET screen-snapshot animation is especially polished | still needs more testing |
 
 ### GPT 5.6 Sol
@@ -382,7 +382,7 @@ Harnesses are the apps/CLIs that models run inside. They're judged on different 
 |---|---|---|
 | UI / UX | | chat titles sometimes wrong, all caps, weird format; suspect backend issue |
 | Ease of use | | unreliable chat-naming with some models |
-| Customizability | works as expected with custom system prompts for some models (e.g. GPT 5.6 Tera) | |
+| Customizability | works as expected with custom system prompts for some models (e.g. GPT 5.6 Tera); GPT 5.6 Tera in Cherry Studio produced an excellent OLX ad description, with Hindsight memory context likely contributing | |
 | Flexibility | | doesn't surface third-party built-in search tools well to Claude models |
 | Speed / responsiveness | initially fast with good results as a search assistant (Gemini 3.1 Flash) | Gemini 3.1 Flash hallucinated details as search assistant |
 | Resource consumption | | |
