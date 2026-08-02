@@ -123,6 +123,21 @@ For each model, keep a running list of observations under each aspect — short 
 | Formatting / output quality | | |
 | Other | heard good things on Twitter/elsewhere | little first-hand testing; Go plan rate limits cut testing short; no verdict until revisiting on Pro subscription |
 
+### GPT 5.6 Luna
+
+| Aspect | Pros | Cons |
+|---|---|---|
+| Reasoning | "Luna maxing" trend on Twitter: users report Luna at max effort matches Tera at medium effort and Sol at low effort in intelligence, at a fraction of the cost | not personally tested yet; claims are from Twitter/community reports, not first-hand |
+| Coding | community claims it's good enough for simple coding tasks at max effort, and people are leveraging it for exactly that given the low cost | |
+| Instruction-following | | |
+| Tool use / agentic | | |
+| Context handling | | |
+| Speed / latency | | |
+| Cost / efficiency | incredibly cheap relative to Tera/Sol for reportedly comparable intelligence at matched effort levels, driving the "Luna maxing" trend of using it for everyday tasks | |
+| Refusals / safety behavior | | |
+| Formatting / output quality | | |
+| Other | | reportedly weak for factual/deep-research tasks per community claims; no personal verdict yet — will update after trying it |
+
 ---
 
 ## Google
