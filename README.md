@@ -21,6 +21,12 @@ skills/
   search/SKILL.md
 apps/
   report-card/              Vite + React + TypeScript site that renders the report card
+tools/
+  cherry-hillclimb/         daily prompt hill-climbing harness for a Cherry Studio assistant (see below)
+prompts/
+  cherry-studio/<slug>/     current.md, candidate.md, history/, CHANGELOG.md per assistant (cherry-hillclimb output)
+reports/
+  cherry-hillclimb/         one dated report per propose run (learnings kept/rejected, diff)
 .github/workflows/deploy.yml   CI on every PR; build + deploy on every push to main
 ```
 
@@ -41,6 +47,10 @@ Point a tool's system prompt at a `skills/*/SKILL.md` file to apply that behavio
   - `daily-codex-learning-extraction.md` — the Codex-specific self-learning variant: audits **Codex**
     session transcripts (`~/.codex/sessions/**`) directly, reading each session's project `cwd` from its
     `session_meta` line and writing to the same `~/.codex/AGENTS.md` map + `~/.codex/docs/` tree.
+  - `cherry-studio-personal-prompt-hillclimb.md` — a different kind of persona: not a coding-agent
+    instruction file but the exact system prompt sent to an LLM by `tools/cherry-hillclimb/analyze.mjs`
+    (see "Cherry Studio prompt hill-climbing" below). Analyzes one Cherry Studio assistant's own recent
+    chat history and proposes a justified edit to its own system prompt.
 - **`hinsighter/`** — the detailed operating protocol for the Hindsight MCP memory server. Documents the
   tool surface (`memoryRecall`, `memoryRetain`, `memorySyncRetain`, `memoryReflect`), the required
   `bank_id` on every call, bank definitions, decision gates for _should I recall / reflect / retain_,
@@ -99,6 +109,40 @@ Rules the parser enforces:
   extend `CANONICAL_ASPECTS` first.
 - Fenced code blocks are stripped before parsing, which is why the template in the file's own
   "How to use" section is not treated as data.
+
+## Cherry Studio prompt hill-climbing
+
+`tools/cherry-hillclimb/` is a self-contained Node harness that improves a Cherry Studio assistant's
+system prompt over time by mining its own recent chat history for durable, evidenced learnings — a small
+daily "hill-climb" loop, not an automatic rewrite. See
+[`tools/cherry-hillclimb/README.md`](tools/cherry-hillclimb/README.md) for exact run instructions,
+environment variables, troubleshooting, and the operational decisions (model choice, debug-port launch
+method, assistant-resolution gotchas) made while building and live-testing it.
+
+Each day, `propose` (1) reads the assistant's live system prompt and the last 24h of its conversations
+straight out of the running app over the Chrome DevTools Protocol, (2) sends both to an analyzer persona
+(`skills/hill-climb/cherry-studio-personal-prompt-hillclimb.md`) via Cherry Studio's own local API server,
+which returns gated, evidenced learnings and — only when confirmed learnings justify it — a candidate
+prompt, and (3) writes `current.md`, `candidate.md`, and a dated report under `prompts/cherry-studio/…`
+and `reports/cherry-hillclimb/` for you to review. Nothing is written back to the app until you run
+`apply`, and `apply` refuses to run if the live prompt has drifted since the proposal (e.g. you edited it
+in the UI meanwhile) or if verification after the dispatch doesn't match, rolling back in that case.
+
+```bash
+export CHERRY_API_KEY=cs-sk-…      # Cherry Studio → Settings → API Server, or ~/.cherry-hillclimb.env
+npm run cherry:debug               # relaunch Cherry Studio with a loopback-only CDP debug port
+npm run cherry:propose             # extract + analyze; writes candidate.md + a report, applies nothing
+npm run cherry:diff                # print the current.md → candidate.md diff
+npm run cherry:apply               # push the reviewed candidate.md into the live assistant
+```
+
+All four `cherry:*` scripts default to the assistant named `Personal`; pass `-- --assistant "Name"` to
+target another one. `propose` also takes `-- --hours 24` (lookback window) and `-- --model <id>` (defaults
+to a verified-compliant model, currently `gpt-5.6-terra` — see `tools/cherry-hillclimb/README.md` for why
+this isn't simply the first model Cherry Studio's API server reports). The evidence gate is enforced
+twice — once by the analyzer persona's instructions, once programmatically in `analyze.mjs`, which drops
+any "confirmed" learning whose quoted evidence cannot be found verbatim in the extracted transcript before
+it's allowed to justify a prompt edit.
 
 ## Commands
 

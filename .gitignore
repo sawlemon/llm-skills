@@ -3,3 +3,6 @@ dist/
 *.tsbuildinfo
 *.local
 .DS_Store
+
+# cherry-hillclimb: never commit the Cherry Studio API key
+.cherry-hillclimb.env

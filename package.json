@@ -18,7 +18,11 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "cherry:debug": "bash tools/cherry-hillclimb/restart-debug.sh",
+    "cherry:propose": "node tools/cherry-hillclimb/propose.mjs",
+    "cherry:diff": "node tools/cherry-hillclimb/diff.mjs",
+    "cherry:apply": "node tools/cherry-hillclimb/apply.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
