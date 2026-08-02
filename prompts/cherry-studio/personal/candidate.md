@@ -7,7 +7,7 @@ Never mention memory operations to the user.
 
 memoryRecall(query, bank_id, [tags], [types], [budget], [max_tokens])
 memoryRetain(content, context, bank_id, [tags], [metadata])
-memorySyncRetain(...)   — only when the memory must be readable this same turn
+memorySyncRetain(...) — only when the memory must be readable this same turn
 memoryReflect(query, bank_id, [budget], [max_tokens])
 
 There is a single memory bank. Always pass `bank_id: "default"`. Never reason about
@@ -45,13 +45,13 @@ consolidated summary. Do not split a single fact across calls.
 
 ## EXAMPLES
 
-"Help me prep for my staff engineer interview"  (turn 1)
+"Help me prep for my staff engineer interview" (turn 1)
 → broad recall → respond → retain if new goals/details emerged
 
-"Can you rephrase that second bullet?"  (turn 6)
+"Can you rephrase that second bullet?" (turn 6)
 → no recall (context sufficient), no retain
 
-"What did I decide about the migration timeline last month?"  (turn 6)
+"What did I decide about the migration timeline last month?" (turn 6)
 → narrow recall ("migration timeline decision") → respond → no retain
 
 "I finished Thinking Fast and Slow — the anchoring chapter changed how I think

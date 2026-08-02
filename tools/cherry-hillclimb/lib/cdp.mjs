@@ -3,7 +3,7 @@
 // built-in fetch and WebSocket.
 
 const DEBUG_PORT = Number(process.env.CHERRY_DEBUG_PORT || 9223);
-const DEBUG_HOST = "127.0.0.1";
+const DEBUG_HOST = '127.0.0.1';
 
 class CdpError extends Error {}
 
@@ -16,7 +16,7 @@ async function listTargets() {
     throw new CdpError(
       `Cannot reach Cherry Studio debug port ${DEBUG_PORT} (${err.message}). ` +
         `Cherry Studio must be running with --remote-debugging-port=${DEBUG_PORT}. ` +
-        `Run: npm run cherry:debug`
+        `Run: npm run cherry:debug`,
     );
   }
   if (!res.ok) {
@@ -27,11 +27,11 @@ async function listTargets() {
 
 /** Pick the main renderer page target (not devtools, not the mini window). */
 function pickMainPageTarget(targets) {
-  const pages = targets.filter((t) => t.type === "page" && /index\.html(\?|$)/.test(t.url || ""));
+  const pages = targets.filter((t) => t.type === 'page' && /index\.html(\?|$)/.test(t.url || ''));
   if (pages.length === 0) {
     throw new CdpError(
       `No Cherry Studio main-window page target found among ${targets.length} debug targets. ` +
-        `Is the main window open (not just tray/mini window)?`
+        `Is the main window open (not just tray/mini window)?`,
     );
   }
   // Prefer a target whose URL does not reference the miniWindow/selection html files.
@@ -44,7 +44,7 @@ class CdpSession {
     this.ws = ws;
     this.nextId = 1;
     this.pending = new Map();
-    this.ws.addEventListener("message", (ev) => {
+    this.ws.addEventListener('message', (ev) => {
       let msg;
       try {
         msg = JSON.parse(ev.data.toString());
@@ -54,7 +54,7 @@ class CdpSession {
       if (msg.id != null && this.pending.has(msg.id)) {
         const { resolve, reject } = this.pending.get(msg.id);
         this.pending.delete(msg.id);
-        if (msg.error) reject(new CdpError(msg.error.message || "CDP error"));
+        if (msg.error) reject(new CdpError(msg.error.message || 'CDP error'));
         else resolve(msg.result);
       }
     });
@@ -76,7 +76,7 @@ class CdpSession {
    * indentation/comments freely.
    */
   async evaluate(expression) {
-    const result = await this.send("Runtime.evaluate", {
+    const result = await this.send('Runtime.evaluate', {
       expression,
       awaitPromise: true,
       returnByValue: true,
@@ -85,7 +85,7 @@ class CdpSession {
     if (result.exceptionDetails) {
       const detail = result.exceptionDetails;
       const text =
-        detail.exception?.description || detail.exception?.value || detail.text || "evaluation threw";
+        detail.exception?.description || detail.exception?.value || detail.text || 'evaluation threw';
       throw new CdpError(`Page evaluation failed: ${text}`);
     }
     return result.result?.value;
@@ -102,8 +102,8 @@ export async function connect() {
   const target = pickMainPageTarget(targets);
   const ws = new WebSocket(target.webSocketDebuggerUrl);
   await new Promise((resolve, reject) => {
-    ws.addEventListener("open", () => resolve(), { once: true });
-    ws.addEventListener("error", (e) => reject(new CdpError(`WebSocket error: ${e.message || e}`)), {
+    ws.addEventListener('open', () => resolve(), { once: true });
+    ws.addEventListener('error', (e) => reject(new CdpError(`WebSocket error: ${e.message || e}`)), {
       once: true,
     });
   });

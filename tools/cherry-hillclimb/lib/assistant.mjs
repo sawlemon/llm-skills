@@ -42,14 +42,14 @@ export async function resolveAssistant(session, name) {
 
   const result = await session.evaluate(expr);
   if (!result) {
-    throw new AssistantResolutionError("Could not read assistants slice from window.store");
+    throw new AssistantResolutionError('Could not read assistants slice from window.store');
   }
   if (result.matchCount === 0) {
     throw new AssistantResolutionError(`No assistant named ${JSON.stringify(name)} found`);
   }
   if (result.matchCount > 1) {
     throw new AssistantResolutionError(
-      `${result.matchCount} assistants named ${JSON.stringify(name)} found; name must be unique`
+      `${result.matchCount} assistants named ${JSON.stringify(name)} found; name must be unique`,
     );
   }
 
@@ -61,7 +61,7 @@ export async function resolveAssistant(session, name) {
   // element is authoritative for `assistants/updateAssistant` dispatches.
   if (assistant.id === result.defaultAssistantId && assistant.prompt.length === 0) {
     throw new AssistantResolutionError(
-      "Resolved assistant looks like the sibling defaultAssistant placeholder (empty prompt), not a real named assistant"
+      'Resolved assistant looks like the sibling defaultAssistant placeholder (empty prompt), not a real named assistant',
     );
   }
 

@@ -66,7 +66,7 @@ written to the live app just from running `propose`. Always read the report and
    with `Analyzer did not return valid JSON`, check whether Cherry Studio's model list
    changed and update this preference list — don't just revert to taking the first model.
 3. **Assistant id vs. name.** The **Personal** assistant's `id` is literally the string
-   `"default"` — which is *also* the id of a completely separate object,
+   `"default"` — which is _also_ the id of a completely separate object,
    `state.assistants.defaultAssistant` (a permanently-empty-prompt placeholder Cherry
    Studio ships with, unrelated to any user-named assistant). `lib/assistant.mjs` resolves
    assistants **by `name`** from the `assistants` array only, and explicitly asserts the
@@ -84,13 +84,13 @@ written to the live app just from running `propose`. Always read the report and
    model returned — a model can propose edits, but only programmatically-verified evidence
    can make them stick.
 6. **Drift guard on apply.** `apply.mjs` reads `current.md`'s recorded sha256 and compares
-   it to the *live* prompt's sha256 before writing anything. If they don't match (e.g. you
+   it to the _live_ prompt's sha256 before writing anything. If they don't match (e.g. you
    edited the prompt in the Cherry Studio UI after `propose` ran, or a stale `current.md`
    from a `--hours 0` dry run is lying around), it refuses and tells you to re-run
    `propose`. This was verified live: it correctly blocked an apply attempt after the live
    prompt had moved on from what `current.md` recorded.
 7. **Pre-apply snapshot + post-apply verification.** Every `apply` writes a timestamped
-   pre-apply snapshot to `history/` *before* dispatching the change, then re-reads the live
+   pre-apply snapshot to `history/` _before_ dispatching the change, then re-reads the live
    state afterward and compares it to `candidate.md`. On a mismatch it automatically
    re-dispatches the pre-apply snapshot (best-effort rollback) and exits non-zero — don't
    assume a non-crashing dispatch means the write succeeded; the script already checks this
