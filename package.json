@@ -10,6 +10,7 @@
     "node": ">=26"
   },
   "scripts": {
+    "prepare": "node tools/setup-git-hooks.mjs",
     "dev": "npm run dev -w report-card",
     "build": "npm run build -w report-card",
     "preview": "npm run preview -w report-card",

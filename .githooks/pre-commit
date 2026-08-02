@@ -1,0 +1,15 @@
+#!/bin/sh
+set -eu
+
+repo_root=$(git rev-parse --show-toplevel)
+cd "$repo_root"
+
+# Format only staged files that Prettier understands, then re-stage the result.
+# .prettierignore still protects source-of-truth prose such as LLM_REPORT_CARD.md.
+files=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(css|html|js|json|md|mjs|ts|tsx|yml|yaml)$' || true)
+if [ -z "$files" ]; then
+  exit 0
+fi
+
+printf '%s\n' "$files" | xargs npx prettier --write --
+printf '%s\n' "$files" | xargs git add --

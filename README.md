@@ -70,6 +70,13 @@ so editing the markdown is the only step needed to update the published page.
 A malformed report card **fails the build** with the offending line number, rather than silently shipping a
 broken page. The same parser runs under `npm test`, so problems surface locally too.
 
+### Commit-time formatting guard
+
+`npm install` / `npm ci` enables the repository's `.githooks/pre-commit` hook. It formats staged
+Prettier-supported files and re-stages them before the commit is created; `.prettierignore` still
+protects source-of-truth prose such as `LLM_REPORT_CARD.md`. GitHub Actions keeps the final
+`format:check` as a backstop for commits made with hooks bypassed or from another environment.
+
 ### Authoring an observation
 
 The structure is provider → model → aspect table:
