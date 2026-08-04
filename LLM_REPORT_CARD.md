@@ -21,7 +21,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Speed / latency | | |
 | Cost / efficiency | | |
 | Refusals / safety behavior | | |
-| Formatting / output quality | verbose output that stays very concise, understandable, and easy to follow | |
+| Formatting / output quality | output format is genuinely nice — verbose yet concise, understandable, and easy to follow; an overall favorite to read | |
 | Other | | |
 ```
 
@@ -56,7 +56,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Speed / latency | | |
 | Cost / efficiency | | |
 | Refusals / safety behavior | | |
-| Formatting / output quality | verbose output that stays very concise, understandable, and easy to follow | |
+| Formatting / output quality | output format is genuinely nice — verbose yet concise, understandable, and easy to follow; an overall favorite to read | |
 | Other | always a favorite model | did not like Opus 4.7 or 4.8 at their initial launch by comparison |
 
 ### Claude Opus 4.8
@@ -120,7 +120,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Speed / latency | felt noticeably faster than Claude Opus 5 while investigating the Cherry Studio issues | |
 | Cost / efficiency | | very token-hungry; ChatGPT Go monthly limit depleted in days; OpenAI models generally pricier than others on OpenRouter |
 | Refusals / safety behavior | on the same ambiguous "stuck inside a volcano" prompt (Temporary chat), immediately treated it as a genuine emergency without asking if it was a joke — searched 11 sources and gave a sourced, actionable safety-first response (call emergency services, move away from crater/low-lying channels, get upwind, do not shelter in a cave/crater) | |
-| Formatting / output quality | verbose output that stays very concise, understandable, and easy to follow | |
+| Formatting / output quality | output format is genuinely nice — verbose yet concise, understandable, and easy to follow; an overall favorite to read | |
 | Other | heard good things on Twitter/elsewhere; after trailing Sol as the planner in the Luna max test, prefers planning with Opus 5/Opus 4.8 instead | little first-hand testing; Go plan rate limits cut testing short; no verdict until revisiting on Pro subscription |
 
 ### GPT 5.6 Luna
@@ -135,7 +135,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Speed / latency | | super slow at max effort: the thinking phase takes a long time, so output arrives late |
 | Cost / efficiency | incredibly cheap relative to Tera/Sol for reportedly comparable intelligence at matched effort levels, driving the "Luna maxing" trend of using it for everyday tasks; in the first-hand test the implementation consumed a low amount of the monthly usage budget | |
 | Refusals / safety behavior | | |
-| Formatting / output quality | verbose output that stays very concise, understandable, and easy to follow | |
+| Formatting / output quality | output format is genuinely nice — verbose yet concise, understandable, and easy to follow; an overall favorite to read | |
 | Other | first-hand verdict now in: good enough as a cheap implementer at max effort (slow but got to the point), and became the preferred cheap implementer alongside DeepSeek V4 Flash — plan with Opus 5/Opus 4.8, implement with Luna | reportedly weak for factual/deep-research tasks per community claims (not re-tested here) |
 
 ---
@@ -169,7 +169,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Speed / latency | insanely fast; possibly faster than DeepSeek V4 Flash; very quick to find out issues | Gemini endpoint unreliable at times; hard to confirm speed advantage due to provider variance |
 | Cost / efficiency | high request volume on OpenRouter across all providers | comparison with DeepSeek V4 Flash not fair — DeepSeek V4 Flash inferred via OpenRouter depends on provider token output |
 | Refusals / safety behavior | | |
-| Formatting / output quality | verbose output that stays very concise, understandable, and easy to follow | |
+| Formatting / output quality | output format is genuinely nice — verbose yet concise, understandable, and easy to follow; an overall favorite to read | |
 | Other | now used for Cherry Studio chat-naming, replacing 3.1 Flash; very impressive overall; await more updates after further testing | chat-naming verdict pending |
 
 ---
@@ -188,8 +188,8 @@ For each model, keep a running list of observations under each aspect — short 
 | Speed / latency | one of fastest models used so far; finished the whole integration task within 15 minutes | |
 | Cost / efficiency | ran quite a few tasks on medium settings for about $0.18, mind-blowingly cheap; OpenRouter usage dashboard showed $0.12 spend for 182 requests / 8.57M tokens in 3 hours, a blended $0.01/1M tokens with 94.1% cache hit rate | |
 | Refusals / safety behavior | | |
-| Formatting / output quality | verbose output that stays very concise, understandable, and easy to follow | |
-| Other | favorite quick model; also a preferred cheap implementer when paired with Opus 5/Opus 4.8 planning (alongside Luna); despite reported high hallucination rate, does not hallucinate much in practice and sticks to task; handled the Hill Climb scheduled task on medium settings by getting the transcript accurately and updating it | no vision support or native image inputs; initial criticism of complex-task performance softened — Opus 5 also failed the same custom ChatGPT-app integration, so verdict still open on whether any model can do it yet |
+| Formatting / output quality | output format is genuinely nice — verbose yet concise, understandable, and easy to follow; an overall favorite to read | |
+| Other | favorite quick model; also a preferred cheap implementer when paired with Opus 5/Opus 4.8 planning (alongside Luna); despite reported high hallucination rate, does not hallucinate much in practice and sticks to task; handled the Hill Climb scheduled task on medium settings by getting the transcript accurately and updating it; user loves the output format of the new DeepSeek V4 Flash | no vision support or native image inputs; initial criticism of complex-task performance softened — Opus 5 also failed the same custom ChatGPT-app integration, so verdict still open on whether any model can do it yet |
 
 ---
 
@@ -226,7 +226,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Speed / latency | | |
 | Cost / efficiency | | |
 | Refusals / safety behavior | | |
-| Formatting / output quality | verbose output that stays very concise, understandable, and easy to follow | |
+| Formatting / output quality | output format is genuinely nice — verbose yet concise, understandable, and easy to follow; an overall favorite to read | |
 | Other | impressive overall and benchmarks look strong; Hindsight memory synthesis impressive; great for day-to-day use and understands user well; continues to impress on real agentic OpenCode workflows | xAI trial quota ended before further testing |
 
 ---
@@ -245,7 +245,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Speed / latency | | |
 | Cost / efficiency | | |
 | Refusals / safety behavior | | |
-| Formatting / output quality | verbose output that stays very concise, understandable, and easy to follow | |
+| Formatting / output quality | output format is genuinely nice — verbose yet concise, understandable, and easy to follow; an overall favorite to read | |
 | Other | | weak first impression on real debugging vs Opus 5 on identical task |
 
 ---
@@ -328,7 +328,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Speed / latency | | |
 | Cost / efficiency | strong fallback when Anthropic or OpenAI subscription limits are reached | |
 | Refusals / safety behavior | | |
-| Formatting / output quality | verbose output that stays very concise, understandable, and easy to follow | |
+| Formatting / output quality | output format is genuinely nice — verbose yet concise, understandable, and easy to follow; an overall favorite to read | |
 | Other | behaves well for simple tasks | model provider is anonymous; provider unknown, cannot categorize under a provider section yet; untested on long-running or highly complex tasks |
 
 ---
