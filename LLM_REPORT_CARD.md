@@ -380,14 +380,14 @@ Harnesses are the apps/CLIs that models run inside. They're judged on different 
 
 | Aspect | Pros | Cons |
 |---|---|---|
-| UI / UX | | chat titles sometimes wrong, all caps, weird format; suspect backend issue |
+| UI / UX | new Cherry Studio UI is pretty impressive; love the new UI | chat titles sometimes wrong, all caps, weird format; suspect backend issue |
 | Ease of use | | unreliable chat-naming with some models |
 | Customizability | works as expected with custom system prompts for some models (e.g. GPT 5.6 Tera); GPT 5.6 Tera in Cherry Studio produced an excellent OLX ad description, with Hindsight memory context likely contributing | |
 | Flexibility | | doesn't surface third-party built-in search tools well to Claude models |
 | Speed / responsiveness | initially fast with good results as a search assistant (Gemini 3.1 Flash) | Gemini 3.1 Flash hallucinated details as search assistant |
 | Resource consumption | | |
 | Model support | | doesn't reliably deliver an injected system prompt to first-party Anthropic models; traced to the CLI proxy stripping the custom prompt and injecting its own, likely to avoid getting the account banned — a harness/proxy issue, not a model issue |
-| Other | | general fragility around system-prompt delivery to Anthropic models |
+| Other | | a recent Cherry Studio update broke the existing workflow when replaying old messages; workaround is to start a new chat instead of continuing an old one; general fragility around system-prompt delivery to Anthropic models |
 
 ### OpenCode
 
@@ -413,4 +413,4 @@ Harnesses are the apps/CLIs that models run inside. They're judged on different 
 | Speed / responsiveness | | |
 | Resource consumption | | |
 | Model support | successfully routed Codex desktop messages to DeepSeek V4 Flash; switching the upstream format for Anthropic models from Chat Completions to Responses (native) fixed tool use and enabled spawning sub-agents in Codex — Chat Completions as upstream caused errors and blocked both tool use and sub-agent spawning for Anthropic models | cliproxyapi bug: older CC Switch builds wrote assistant message IDs as `resp_<id>_msg`; when a Claude-model conversation history with those IDs later replayed against a GPT model via the OpenAI Responses API, it was rejected since Responses API IDs must start with `msg` — fixed by adding a Codex-protocol payload filter in `/opt/homebrew/etc/cliproxyapi.conf` to strip those IDs before forwarding, then restarting cliproxyapi |
-| Other | | new setup; needs more testing before a broader verdict; cloud models routed through CC Switch can be troublesome on advanced tasks — a long-horizon task appeared to get stuck thinking, with the last command repeatedly shown while the thinking view was expanded; possibly a UI or streaming-response issue, but tool calling is not consistently smooth; HTTP 400 errors seen when routing Claude models through cliproxyapi initially looked like a routing/config failure, but were actually caused by an Anthropic-side outage (Anthropic servers down) — Anthropic gave no status-page/notification about it; only found out via X/Twitter |
+| Other | | new setup; needs more testing before a broader verdict; CC Switch is not working reliably as expected and has lots of issues; cloud models routed through CC Switch can be troublesome on advanced tasks — a long-horizon task appeared to get stuck thinking, with the last command repeatedly shown while the thinking view was expanded; possibly a UI or streaming-response issue, but tool calling is not consistently smooth; HTTP 400 errors seen when routing Claude models through cliproxyapi initially looked like a routing/config failure, but were actually caused by an Anthropic-side outage (Anthropic servers down) — Anthropic gave no status-page/notification about it; only found out via X/Twitter |
