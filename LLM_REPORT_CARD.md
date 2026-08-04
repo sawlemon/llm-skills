@@ -112,12 +112,12 @@ For each model, keep a running list of observations under each aspect — short 
 
 | Aspect | Pros | Cons |
 |---|---|---|
-| Reasoning | | |
+| Reasoning | resolved both Cherry Studio issues I presented; felt as good as Claude Opus 5 at hunting down issues | |
 | Coding | | |
 | Instruction-following | | |
 | Tool use / agentic | | |
 | Context handling | | |
-| Speed / latency | | |
+| Speed / latency | felt noticeably faster than Claude Opus 5 while investigating the Cherry Studio issues | |
 | Cost / efficiency | | very token-hungry; ChatGPT Go monthly limit depleted in days; OpenAI models generally pricier than others on OpenRouter |
 | Refusals / safety behavior | on the same ambiguous "stuck inside a volcano" prompt (Temporary chat), immediately treated it as a genuine emergency without asking if it was a joke — searched 11 sources and gave a sourced, actionable safety-first response (call emergency services, move away from crater/low-lying channels, get upwind, do not shelter in a cave/crater) | |
 | Formatting / output quality | | |
