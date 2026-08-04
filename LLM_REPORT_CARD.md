@@ -112,7 +112,7 @@ For each model, keep a running list of observations under each aspect — short 
 
 | Aspect | Pros | Cons |
 |---|---|---|
-| Reasoning | resolved both Cherry Studio issues I presented; felt as good as Claude Opus 5 at hunting down issues | |
+| Reasoning | resolved both Cherry Studio issues I presented; felt as good as Claude Opus 5 at hunting down issues | disappointing as a planner in first-hand test: the initial "Luna maxing" plan (plan with Sol, implement with Luna max) needed multiple manual edits and still missed obvious flaws that were implemented anyway, with no easy way to back out |
 | Coding | | |
 | Instruction-following | | |
 | Tool use / agentic | | |
@@ -121,22 +121,22 @@ For each model, keep a running list of observations under each aspect — short 
 | Cost / efficiency | | very token-hungry; ChatGPT Go monthly limit depleted in days; OpenAI models generally pricier than others on OpenRouter |
 | Refusals / safety behavior | on the same ambiguous "stuck inside a volcano" prompt (Temporary chat), immediately treated it as a genuine emergency without asking if it was a joke — searched 11 sources and gave a sourced, actionable safety-first response (call emergency services, move away from crater/low-lying channels, get upwind, do not shelter in a cave/crater) | |
 | Formatting / output quality | | |
-| Other | heard good things on Twitter/elsewhere | little first-hand testing; Go plan rate limits cut testing short; no verdict until revisiting on Pro subscription |
+| Other | heard good things on Twitter/elsewhere; after trailing Sol as the planner in the Luna max test, prefers planning with Opus 5/Opus 4.8 instead | little first-hand testing; Go plan rate limits cut testing short; no verdict until revisiting on Pro subscription |
 
 ### GPT 5.6 Luna
 
 | Aspect | Pros | Cons |
 |---|---|---|
-| Reasoning | "Luna maxing" trend on Twitter: users report Luna at max effort matches Tera at medium effort and Sol at low effort in intelligence, at a fraction of the cost | not personally tested yet; claims are from Twitter/community reports, not first-hand |
+| Reasoning | "Luna maxing" trend on Twitter: users report Luna at max effort matches Tera at medium effort and Sol at low effort in intelligence, at a fraction of the cost; on first-hand test at max effort as the implementer, it got to the point and completed the task | |
 | Coding | community claims it's good enough for simple coding tasks at max effort, and people are leveraging it for exactly that given the low cost | |
 | Instruction-following | | |
 | Tool use / agentic | | |
 | Context handling | | |
-| Speed / latency | | |
-| Cost / efficiency | incredibly cheap relative to Tera/Sol for reportedly comparable intelligence at matched effort levels, driving the "Luna maxing" trend of using it for everyday tasks | |
+| Speed / latency | | super slow at max effort: the thinking phase takes a long time, so output arrives late |
+| Cost / efficiency | incredibly cheap relative to Tera/Sol for reportedly comparable intelligence at matched effort levels, driving the "Luna maxing" trend of using it for everyday tasks; in the first-hand test the implementation consumed a low amount of the monthly usage budget | |
 | Refusals / safety behavior | | |
 | Formatting / output quality | | |
-| Other | | reportedly weak for factual/deep-research tasks per community claims; no personal verdict yet — will update after trying it |
+| Other | first-hand verdict now in: good enough as a cheap implementer at max effort (slow but got to the point), and became the preferred cheap implementer alongside DeepSeek V4 Flash — plan with Opus 5/Opus 4.8, implement with Luna | reportedly weak for factual/deep-research tasks per community claims (not re-tested here) |
 
 ---
 
@@ -189,7 +189,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Cost / efficiency | ran quite a few tasks on medium settings for about $0.18, mind-blowingly cheap; OpenRouter usage dashboard showed $0.12 spend for 182 requests / 8.57M tokens in 3 hours, a blended $0.01/1M tokens with 94.1% cache hit rate | |
 | Refusals / safety behavior | | |
 | Formatting / output quality | | |
-| Other | favorite quick model; despite reported high hallucination rate, does not hallucinate much in practice and sticks to task; handled the Hill Climb scheduled task on medium settings by getting the transcript accurately and updating it | no vision support or native image inputs; initial criticism of complex-task performance softened — Opus 5 also failed the same custom ChatGPT-app integration, so verdict still open on whether any model can do it yet |
+| Other | favorite quick model; also a preferred cheap implementer when paired with Opus 5/Opus 4.8 planning (alongside Luna); despite reported high hallucination rate, does not hallucinate much in practice and sticks to task; handled the Hill Climb scheduled task on medium settings by getting the transcript accurately and updating it | no vision support or native image inputs; initial criticism of complex-task performance softened — Opus 5 also failed the same custom ChatGPT-app integration, so verdict still open on whether any model can do it yet |
 
 ---
 
