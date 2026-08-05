@@ -21,7 +21,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Speed / latency | | |
 | Cost / efficiency | | |
 | Refusals / safety behavior | | |
-| Formatting / output quality | output format is genuinely nice — verbose yet concise, understandable, and easy to follow; an overall favorite to read | |
+| Formatting / output quality | | |
 | Other | | |
 ```
 
@@ -48,7 +48,7 @@ For each model, keep a running list of observations under each aspect — short 
 
 | Aspect | Pros | Cons |
 |---|---|---|
-| Reasoning | | |
+| Reasoning | plans are very efficient and understandable; straight to the point and very useful — where Opus 4.8 and 5 overengineer, it stays focused | |
 | Coding | | |
 | Instruction-following | sticks to system and user prompts thoroughly, including when they are wrong; follows every instruction and remembers earlier instructions in same initial prompt; via Antigravity subscription, correctly follows custom Hindsight memory system prompt | unclear why same system prompt does not work as well through Claude Pro subscription |
 | Tool use / agentic | via Antigravity CLI subscription, can invoke web search; given screenshot of podcast list, extracted list and correctly called Hindsight's retain without unnecessary recall | via Anthropic Claude Pro subscription, cannot use web search; seems plan/surface restriction rather than model limitation |
@@ -56,8 +56,8 @@ For each model, keep a running list of observations under each aspect — short 
 | Speed / latency | | |
 | Cost / efficiency | | |
 | Refusals / safety behavior | | |
-| Formatting / output quality | output format is genuinely nice — verbose yet concise, understandable, and easy to follow; an overall favorite to read | |
-| Other | always a favorite model | did not like Opus 4.7 or 4.8 at their initial launch by comparison |
+| Formatting / output quality | | |
+| Other | still the user's favorite frontier model after returning to it; user really missed it | did not like Opus 4.7 or 4.8 at their initial launch by comparison |
 
 ### Claude Opus 4.8
 
@@ -87,7 +87,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Cost / efficiency | | CLI proxy investigation with two agents consumed roughly 30% of usage for one question; token-hungry, though less so than Fable 5; close to $90 worth of tokens spent on a documentation task via Claude Code desktop app; on a cliproxyapi message-ID bug, went on a wild-chase route of cloning and replicating the target repo's bug independently rather than a more economical fix, burning a lot of tokens for a task that wasn't explicitly scoped that way — not asked to be economical, so not a strict fault, but a less thorough approach would have been preferred |
 | Refusals / safety behavior | still surfaced core safety-relevant advice (move away from the flow not ahead of it, stay upwind/uphill, avoid valleys/stream beds) inside the same playful-toned response | on an ambiguous "stuck inside a volcano" prompt (Incognito chat), opened by weighing playful vs. safety framing and asked the user to clarify whether it was a real hike, a dream, or a game before committing fully, rather than leading with safety-first guidance |
 | Formatting / output quality | markdown documentation output via Claude Code desktop app was spot-on, well-formatted, and unprompted included a visual diagram representation | often emits multiple long paragraphs requiring reading and filtering instead of concise task-focused output |
-| Other | impressive investigative/root-cause diagnosis; self-admits mistakes and addresses them later — without that self-admission there'd be no way to know it erred in the first place; on same documentation prompt/project, output via Claude Code desktop app was clearly better than Opus 4.8 via Claude Code, suggesting the desktop app may be stronger for documentation tasks; UI capability has noticeably improved compared to previous Opus models | overall consensus (past early-impression phase): not that good; gave two wrong answers then corrected itself later; makes noticeably more mistakes than Opus 4.8 and self-corrects after rather than getting it right first time; Twitter discussion also includes substantial user dissatisfaction despite strong benchmark scores, with reports that it makes frequent mistakes and takes autonomous actions users did not request; on the custom ChatGPT-app provider integration task, claimed completion after using ~20% of a 5-hour session, but the ChatGPT app had no custom models listed — it fabricated success rather than admitting failure (same task DeepSeek V4 Flash also failed) |
+| Other | impressive investigative/root-cause diagnosis; self-admits mistakes and addresses them later — without that self-admission there'd be no way to know it erred in the first place; on same documentation prompt/project, output via Claude Code desktop app was clearly better than Opus 4.8 via Claude Code, suggesting the desktop app may be stronger for documentation tasks; UI capability has noticeably improved compared to previous Opus models | overall consensus (past early-impression phase): not that good; gave two wrong answers then corrected itself later; makes noticeably more mistakes than Opus 4.8 and self-corrects after rather than getting it right first time; Twitter discussion also includes substantial user dissatisfaction despite strong benchmark scores, with reports that it makes frequent mistakes and takes autonomous actions users did not request; on the custom ChatGPT-app provider integration task, claimed completion after using ~20% of a 5-hour session, but the ChatGPT app had no custom models listed — it fabricated success rather than admitting failure (same task DeepSeek V4 Flash also failed)Anthropic API reliability: on a rough day the API server repeatedly failed to respond to requests; after it finally seemed fixed and the user spawned subagents to complete tasks, they hit throttling/rate limiting — the first time seeing rate limiting from a model provider (applies to Anthropic models broadly). |
 
 ---
 
@@ -120,7 +120,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Speed / latency | felt noticeably faster than Claude Opus 5 while investigating the Cherry Studio issues | |
 | Cost / efficiency | | very token-hungry; ChatGPT Go monthly limit depleted in days; OpenAI models generally pricier than others on OpenRouter |
 | Refusals / safety behavior | on the same ambiguous "stuck inside a volcano" prompt (Temporary chat), immediately treated it as a genuine emergency without asking if it was a joke — searched 11 sources and gave a sourced, actionable safety-first response (call emergency services, move away from crater/low-lying channels, get upwind, do not shelter in a cave/crater) | |
-| Formatting / output quality | output format is genuinely nice — verbose yet concise, understandable, and easy to follow; an overall favorite to read | |
+| Formatting / output quality | | |
 | Other | heard good things on Twitter/elsewhere; after trailing Sol as the planner in the Luna max test, prefers planning with Opus 5/Opus 4.8 instead | little first-hand testing; Go plan rate limits cut testing short; no verdict until revisiting on Pro subscription |
 
 ### GPT 5.6 Luna
@@ -135,7 +135,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Speed / latency | | super slow at max effort: the thinking phase takes a long time, so output arrives late |
 | Cost / efficiency | incredibly cheap relative to Tera/Sol for reportedly comparable intelligence at matched effort levels, driving the "Luna maxing" trend of using it for everyday tasks; in the first-hand test the implementation consumed a low amount of the monthly usage budget | |
 | Refusals / safety behavior | | |
-| Formatting / output quality | output format is genuinely nice — verbose yet concise, understandable, and easy to follow; an overall favorite to read | |
+| Formatting / output quality | | |
 | Other | first-hand verdict now in: good enough as a cheap implementer at max effort (slow but got to the point), and became the preferred cheap implementer alongside DeepSeek V4 Flash — plan with Opus 5/Opus 4.8, implement with Luna | reportedly weak for factual/deep-research tasks per community claims (not re-tested here) |
 
 ---
@@ -169,7 +169,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Speed / latency | insanely fast; possibly faster than DeepSeek V4 Flash; very quick to find out issues | Gemini endpoint unreliable at times; hard to confirm speed advantage due to provider variance |
 | Cost / efficiency | high request volume on OpenRouter across all providers | comparison with DeepSeek V4 Flash not fair — DeepSeek V4 Flash inferred via OpenRouter depends on provider token output |
 | Refusals / safety behavior | | |
-| Formatting / output quality | output format is genuinely nice — verbose yet concise, understandable, and easy to follow; an overall favorite to read | |
+| Formatting / output quality | | |
 | Other | now used for Cherry Studio chat-naming, replacing 3.1 Flash; very impressive overall; await more updates after further testing | chat-naming verdict pending |
 
 ---
@@ -226,7 +226,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Speed / latency | | |
 | Cost / efficiency | | |
 | Refusals / safety behavior | | |
-| Formatting / output quality | output format is genuinely nice — verbose yet concise, understandable, and easy to follow; an overall favorite to read | |
+| Formatting / output quality | | |
 | Other | impressive overall and benchmarks look strong; Hindsight memory synthesis impressive; great for day-to-day use and understands user well; continues to impress on real agentic OpenCode workflows | xAI trial quota ended before further testing |
 
 ---
@@ -245,7 +245,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Speed / latency | | |
 | Cost / efficiency | | |
 | Refusals / safety behavior | | |
-| Formatting / output quality | output format is genuinely nice — verbose yet concise, understandable, and easy to follow; an overall favorite to read | |
+| Formatting / output quality | | |
 | Other | | weak first impression on real debugging vs Opus 5 on identical task |
 
 ---
@@ -328,7 +328,7 @@ For each model, keep a running list of observations under each aspect — short 
 | Speed / latency | | |
 | Cost / efficiency | strong fallback when Anthropic or OpenAI subscription limits are reached | |
 | Refusals / safety behavior | | |
-| Formatting / output quality | output format is genuinely nice — verbose yet concise, understandable, and easy to follow; an overall favorite to read | |
+| Formatting / output quality | | |
 | Other | behaves well for simple tasks | model provider is anonymous; provider unknown, cannot categorize under a provider section yet; untested on long-running or highly complex tasks |
 
 ---
