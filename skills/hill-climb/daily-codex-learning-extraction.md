@@ -77,7 +77,7 @@ map. The map only needs a pointer to the *category*, which usually already exist
 ---
 
 ## Scope
-- Runs **daily**; review only sessions worked on in the **last 24 hours**.
+- Runs **daily**; review only sessions worked on in the **last 72 hours**.
 - In scope: projects whose working directory is under `~/Downloads/Personal` or
   `~/Downloads/Work`.
 - Codex session logs live at `~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl` (plus
@@ -107,7 +107,7 @@ from collections import defaultdict
 
 HOME = Path.home()
 ROOTS = [HOME / ".codex" / "sessions", HOME / ".codex" / "archived_sessions"]
-WINDOW = 24 * 60 * 60
+WINDOW = 72 * 60 * 60
 SCOPE_MARKERS = ("/Downloads/Personal", "/Downloads/Work")
 SELF_ID = "daily-codex-learning-extraction"   # skip this job's own runs
 now = time.time()
@@ -289,7 +289,12 @@ Read `~/.codex/AGENTS.md` **and** `~/.codex/docs/index.md` (and any docs file yo
 touch) in full before editing, so you understand the current map, structure, and tone. If
 the structure doesn't exist yet, create it from the layout above. Back up the whole tree:
 `cp -R ~/.codex/AGENTS.md ~/.codex/docs ~/.codex/backup-$(date +%Y%m%d)/` (skip files that
-don't exist yet).
+don't exist yet). After confirming the new backup exists and contains the expected files,
+rotate the backups: enumerate only the direct children of `~/.codex/` whose names match
+`backup-*`, sort them newest first, and retain **only the 3 newest backups**. First print
+the exact older backup paths as a dry run, then remove those paths and verify that no more
+than 3 matching backups remain. Never delete a non-matching path, and never prune backups
+if creation or verification of the new backup failed.
 
 ---
 
