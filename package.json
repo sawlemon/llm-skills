@@ -3,21 +3,11 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "workspaces": [
-    "apps/*"
-  ],
   "engines": {
     "node": ">=26"
   },
   "scripts": {
     "prepare": "node tools/setup-git-hooks.mjs",
-    "dev": "npm run dev -w report-card",
-    "build": "npm run build -w report-card",
-    "preview": "npm run preview -w report-card",
-    "test": "npm run test -w report-card",
-    "validate": "npm run validate -w report-card",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "cherry:debug": "bash tools/cherry-hillclimb/restart-debug.sh",
@@ -26,13 +16,6 @@
     "cherry:apply": "node tools/cherry-hillclimb/apply.mjs"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "eslint": "^10.8.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-refresh": "^0.5.3",
-    "globals": "^17.8.0",
-    "prettier": "^3.9.6",
-    "typescript-eslint": "^8.65.0"
+    "prettier": "^3.9.6"
   }
 }

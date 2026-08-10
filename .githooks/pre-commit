@@ -5,7 +5,7 @@ repo_root=$(git rev-parse --show-toplevel)
 cd "$repo_root"
 
 # Format only staged files that Prettier understands, then re-stage the result.
-# .prettierignore still protects source-of-truth prose such as LLM_REPORT_CARD.md.
+# .prettierignore still protects hand-authored prose in prompts/, reports/, and skills/.
 files=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(css|html|js|json|md|mjs|ts|tsx|yml|yaml)$' || true)
 if [ -z "$files" ]; then
   exit 0
