@@ -26,6 +26,22 @@ Three ideas govern everything here:
 There is **no quota**. Zero merges is a correct, successful run when nothing durable
 happened. Fewer, sharper, well-evidenced learnings beat more, weaker ones — always.
 
+## Transactional runner protocol
+
+Use `skills/hill-climb/scripts/codex_learning_extractor.py` for all filesystem work.
+
+1. Run `prepare` first. It acquires the lock, resolves the checkpoint interval,
+   creates the run directory, writes normalized evidence, and copies live memory
+   into staging. It prints the `run_id` and `run_dir`.
+2. Read only the run directory's normalized evidence. Edit only the staged
+   `AGENTS.md`, `docs/`, and ledger. Never edit live `~/.codex` files.
+3. Write one JSON object per candidate to `decisions.jsonl` in the run directory.
+4. Run `validate --run-id <id>`. Do not apply until it returns success.
+5. Review `diff.patch` and `report.md`. If they are correct, run
+   `apply --run-id <id> --apply`. This is the only command that touches live files.
+6. If the run is interrupted, run `recover --run-id <id>`. Never manually
+   advance the checkpoint.
+
 ---
 
 ## Memory model (the structure you maintain)
@@ -76,8 +92,15 @@ map. The map only needs a pointer to the *category*, which usually already exist
 
 ---
 
+## Execution boundary
+
+The transactional runner protocol above is authoritative. The old inline discovery
+example and numbered legacy steps below are retained as reference only. Do not execute
+their fixed-window discovery or edit live memory directly.
+
 ## Scope
-- Runs **daily**; review only sessions worked on in the **last 72 hours**.
+- Runs on its configured schedule; review every session modified since the last successful
+  checkpoint, even when one or more scheduled runs were missed.
 - In scope: projects whose working directory is under `~/Downloads/Personal` or
   `~/Downloads/Work`.
 - Codex session logs live at `~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl` (plus
@@ -85,14 +108,13 @@ map. The map only needs a pointer to the *category*, which usually already exist
   date, not by project** — the project is the `cwd` recorded in each file's first line
   (`type:"session_meta"` → `payload.cwd`). Determine scope by testing whether that `cwd`
   contains `/Downloads/Personal` or `/Downloads/Work` as a substring.
-- **Exclude:** any session whose `payload.thread_source == "subagent"` (Codex flags
-  subagent runs here — there is no `subagents/` path to match on), anything older than 24h,
-  and this job's own runs (skip sessions whose transcript contains the automation id
-  `daily-codex-learning-extraction`, so the extractor never learns from itself).
+- **Exclude:** any session whose payload.thread_source is subagent or automation,
+  malformed sessions, and this job's own runs. The runner owns checkpoint and self-run
+  filtering.
 
 ---
 
-## Step 0 — Discover in-scope sessions (portable, **do this in Python**)
+## Legacy reference: previous discovery example (do not execute)
 
 > ⚠️ Do **not** use a raw `find` one-liner. `-printf`/`-newermt` are GNU-only; on
 > macOS/BSD they fail, and because such pipelines end in `sort` (exit 0), an `||`

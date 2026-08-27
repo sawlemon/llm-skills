@@ -41,6 +41,8 @@ Point a tool's system prompt at a `skills/*/SKILL.md` file to apply that behavio
   - `daily-codex-learning-extraction.md` — the Codex-specific self-learning variant: audits **Codex**
     session transcripts (`~/.codex/sessions/**`) directly, reading each session's project `cwd` from its
     `session_meta` line and writing to the same `~/.codex/AGENTS.md` map + `~/.codex/docs/` tree.
+    The transactional runner in `skills/hill-climb/scripts/codex_learning_extractor.py` handles session
+    discovery, checkpointing, staging, validation, backups, apply, and recovery.
   - `cherry-studio-personal-prompt-hillclimb.md` — a different kind of persona: not a coding-agent
     instruction file but the exact system prompt sent to an LLM by `tools/cherry-hillclimb/analyze.mjs`
     (see "Cherry Studio prompt hill-climbing" below). Analyzes one Cherry Studio assistant's own recent
