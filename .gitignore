@@ -6,3 +6,5 @@ dist/
 
 # cherry-hillclimb: never commit the Cherry Studio API key
 .cherry-hillclimb.env
+__pycache__/
+*.pyc
