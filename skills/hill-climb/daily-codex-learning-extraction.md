@@ -36,11 +36,15 @@ Use `skills/hill-climb/scripts/codex_learning_extractor.py` for all filesystem w
 2. Read only the run directory's normalized evidence. Edit only the staged
    `AGENTS.md`, `docs/`, and ledger. Never edit live `~/.codex` files.
 3. Write one JSON object per candidate to `decisions.jsonl` in the run directory.
-4. Run `validate --run-id <id>`. Do not apply until it returns success.
-5. Review `diff.patch` and `report.md`. If they are correct, run
-   `apply --run-id <id> --apply`. This is the only command that touches live files.
-6. If the run is interrupted, run `recover --run-id <id>`. Never manually
-   advance the checkpoint.
+4. Run `commit --run-id <id>` to finish in one step: it validates, and only on
+   success applies the staged changes and prunes old run dirs/backups (keep the
+   newest 5 by default, tune with `--keep N`). On validation failure it applies
+   nothing and prints the errors so you can fix staging and re-run `commit`.
+   To inspect before writing, run `validate --run-id <id>` and review
+   `diff.patch` / `report.md`; `apply --run-id <id> --apply` still works as the
+   explicit low-level write.
+5. If the run is interrupted, run `recover --run-id <id>`. Never manually
+   advance the checkpoint. Run `prune --keep N` anytime to clean old runs.
 
 ---
 

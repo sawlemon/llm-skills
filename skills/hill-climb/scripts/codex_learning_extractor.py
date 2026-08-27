@@ -434,6 +434,44 @@ def cmd_status(args: argparse.Namespace) -> int:
     print(json.dumps({"lock": read_json(ws.lock), "state": read_json(ws.state), "latest_run": latest}))
     return 0
 
+def prune_runs(ws: Workspace, keep: int) -> dict[str, list[str]]:
+    keep = max(int(keep), 1)
+    removed: dict[str, list[str]] = {"runs": [], "backups": []}
+    locked = (read_json(ws.lock) or {}).get("run_id")
+    if ws.runs.is_dir():
+        run_dirs = sorted((d for d in ws.runs.iterdir() if d.is_dir()), key=lambda d: d.stat().st_mtime, reverse=True)
+        for d in run_dirs[keep:]:
+            if d.name == locked: continue
+            shutil.rmtree(d, ignore_errors=True)
+            removed["runs"].append(d.name)
+    backups = sorted(ws.home.glob("backup-*"), key=lambda d: d.stat().st_mtime, reverse=True)
+    for d in backups[keep:]:
+        if not d.is_dir(): continue
+        shutil.rmtree(d, ignore_errors=True)
+        removed["backups"].append(d.name)
+    return removed
+
+def cmd_commit(args: argparse.Namespace) -> int:
+    ws = Workspace.from_args(args)
+    require_lock(ws, args.run_id)
+    run_dir, _ = load_manifest(ws, args.run_id)
+    passed, errors, changed = validate_run(ws, run_dir)
+    if not passed:
+        print(json.dumps({"committed": False, "stage": "validate", "errors": errors, "changed_files": changed}))
+        return 2
+    args.apply = True
+    rc = cmd_apply(args)
+    if rc != 0:
+        return rc
+    pruned = prune_runs(ws, args.keep)
+    print(json.dumps({"committed": True, "changed_files": changed, "pruned": pruned}))
+    return 0
+
+def cmd_prune(args: argparse.Namespace) -> int:
+    ws = Workspace.from_args(args)
+    print(json.dumps({"pruned": prune_runs(ws, args.keep)}))
+    return 0
+
 def parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--codex-home", default=str(Path.home() / ".codex"))
@@ -458,6 +496,13 @@ def parser() -> argparse.ArgumentParser:
     apply.add_argument("--run-id", required=True)
     apply.add_argument("--apply", action="store_true")
     apply.set_defaults(func=cmd_apply)
+    commit = sub.add_parser("commit")
+    commit.add_argument("--run-id", required=True)
+    commit.add_argument("--keep", type=int, default=5)
+    commit.set_defaults(func=cmd_commit)
+    prune = sub.add_parser("prune")
+    prune.add_argument("--keep", type=int, default=5)
+    prune.set_defaults(func=cmd_prune)
     return p
 
 def main(argv: list[str] | None = None) -> int:
