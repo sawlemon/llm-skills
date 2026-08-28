@@ -47,6 +47,14 @@ Point a tool's system prompt at a `skills/*/SKILL.md` file to apply that behavio
     instruction file but the exact system prompt sent to an LLM by `tools/cherry-hillclimb/analyze.mjs`
     (see "Cherry Studio prompt hill-climbing" below). Analyzes one Cherry Studio assistant's own recent
     chat history and proposes a justified edit to its own system prompt.
+  - `zcode-learning-extraction.md` — the ZCode variant: audits **ZCode** session transcripts, which live
+    in a local SQLite database (`~/.zcode/cli/db/db.sqlite`, tables `session`/`message`/`part`) rather
+    than date-foldered JSONL, and merges durable, gated, evidenced learnings into `~/.zcode/AGENTS.md`
+    (capped at 100 lines) plus `~/.zcode/docs/`. Runs every 2 days via a ZCode scheduled automation;
+    excludes its own automation runs by joining against `automation_runs.session_id` in
+    `~/.zcode/v2/tasks-index.sqlite`, and strips ZCode-specific injected noise (TodoWrite reminders,
+    `userselect` IDE pastes, `[$skill](path)` prefixes, `<scheduled-task>` wrappers). The file's trailing
+    "Deployment notes" section documents the exact schedule and automation prompt used to redeploy it.
 - **`hinsighter/`** — the detailed operating protocol for the Hindsight MCP memory server. Documents the
   tool surface (`memoryRecall`, `memoryRetain`, `memorySyncRetain`, `memoryReflect`), the required
   `bank_id` on every call, bank definitions, decision gates for _should I recall / reflect / retain_,
