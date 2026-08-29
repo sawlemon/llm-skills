@@ -1,0 +1,120 @@
+{
+  "description": "Sanitized historical record of the Hindsight model-selection benchmarks run 2026-08-29 to 2026-08-30. Raw model responses, live memory text, generation IDs, hostnames, usernames, and infrastructure paths are excluded; only measured aggregates remain. The suite in this directory reproduces the methodology; re-running live suites will produce fresh numbers, not these.",
+  "environment": {
+    "hindsight_version": "0.9.2 (latest-slim image)",
+    "hindsight_deployment": "self-hosted instance on a private network",
+    "embedding_model": "perplexity/pplx-embed-v1-0.6b",
+    "reranker_at_time": "cohere/rerank-4-pro",
+    "baseline_retain_model": "z-ai/glm-5.3-flash with global reasoning_effort=high",
+    "openrouter_routing": "provider sort=throughput, require_parameters=true where noted"
+  },
+  "live_telemetry_before_change": {
+    "source": "Hindsight llm-requests telemetry, agents bank, last 100 requests",
+    "retain_extract_facts": { "n": 12, "median_s": 13.967, "mean_s": 14.044, "max_s": 21.6, "model": "z-ai/glm-5.3-flash" },
+    "consolidation": { "n": 30, "median_s": 16.113, "mean_s": 19.58, "max_s": 55.582 },
+    "consolidation_dedup": { "n": 2, "mean_s": 5.437, "max_s": 7.303 }
+  },
+  "retain_matrix_direct": {
+    "method": "Exact live Hindsight extraction system prompt (~3,300 input tokens), strict JSON schema, 3 runs per configuration, synthetic fixture content",
+    "results": [
+      { "label": "glm-high", "success": "3/3", "median_s": 7.786, "range_s": [6.816, 12.636], "criteria_automated": "12/13", "cost_usd_per_call": 0.0009, "note": "The one automated miss was a scoring artifact (model restated the superseded date with an explicit correction qualifier)." },
+      { "label": "glm-none", "success": "0/3", "error": "HTTP 400: Reasoning is mandatory for this endpoint and cannot be disabled.", "note": "OpenRouter rejects effort=none for this model; low is the practical minimum." },
+      { "label": "gpt-oss-20b-low", "success": "3/3", "median_s": 2.118, "range_s": [2.075, 3.29], "criteria_automated": "12/13", "cost_usd_per_call": 0.00049, "note": "Manual review: the automated miss was a scoring artifact; output preserved all material qualifiers." },
+      { "label": "gpt-oss-120b-low", "success": "3/3", "median_s": 11.431, "range_s": [4.897, 15.5], "criteria_automated": "12/13", "cost_usd_per_call": 0.00139, "note": "Routing spread across three providers (Groq/Nebius/BaseTen) made latency inconsistent; ~2x output tokens." },
+      { "label": "gemini-2.5-flash-lite", "success": "3/3", "median_s": 4.771, "criteria_automated": "10/13", "cost_usd_per_call": 0.00086, "note": "Repeatedly omitted the recorded-call count and the API-key rule; weakened the undecided-retention and unproven-cause framing." },
+      { "label": "mistral-small-3.2", "success": "2/3", "median_s": 29.944, "range_s": [27.594, 32.293], "criteria_automated": "11-12/13", "note": "Run 3 returned a non-parseable response; slow through its available endpoint." }
+    ]
+  },
+  "retain_adversarial_direct": {
+    "method": "Synthetic adversarial set covering negation, attribution, uncertainty, rejected suggestions, corrected dates, medical non-diagnosis qualifiers, unproven causality, temporary feedback, entity disambiguation, unverified third-party claims; 3 runs per model",
+    "results": [
+      { "label": "glm-high", "success": "3/3", "median_s": 1.861, "range_s": [1.42, 3.686], "criteria_automated": "11/11 all runs" },
+      { "label": "gpt-oss-20b-low", "success": "3/3", "median_s": 0.806, "range_s": [0.802, 0.921], "criteria_automated": "9/11 all runs", "note": "Two automated flags: tesla_attribution was a scoring artifact (correctly split facts); causality flag was real but subtle - the model omitted the unproven-causation qualifier sentence entirely while never asserting causation. Historical manual review accepted the trade-off; the committed criteria count it as a miss." },
+      { "label": "gemini-2.5-flash-lite", "success": "3/3", "median_s": 2.977, "range_s": [1.234, 3.788], "criteria_automated": "8/11 all runs", "note": "Weakened qualifications and over-extracted (11 facts, several without their qualifiers)." }
+    ]
+  },
+  "long_journal": {
+    "method": "Synthetic 180,000-character journal (29,726 words) with 12 planted durable facts from beginning to end; chunked with the live Hindsight v0.9.2 chunker (docker exec) then each chunk extracted with openai/gpt-oss-20b:nitro, low reasoning, 8-way concurrency",
+    "chunking": { "chunks": 78, "min_chars": 51, "max_chars": 2962, "avg_chars": 2306.96 },
+    "extraction": {
+      "success": "78/78 chunks",
+      "wall_s": 18.424,
+      "median_call_s": 1.48,
+      "p95_call_s": 2.299,
+      "coverage": "12/12 planted facts (automated string checks reported 9/12; manual review confirmed all 12 - the misses were date-normalization and fact-splitting artifacts)",
+      "duplicate_facts": 0,
+      "input_tokens": 261780,
+      "output_tokens": 3616,
+      "cost_usd": 0.01565,
+      "provider": "Groq"
+    }
+  },
+  "boundary_behavior": {
+    "method": "Same fact pairs extracted combined versus as independent no-overlap chunks (Hindsight's plain-text chunker has no overlap)",
+    "findings": [
+      { "case": "decision then correction", "combined": "One corrected fact (decision + rejection merged).", "split": "Two facts: the obsolete decision AND the correction, both persisted." },
+      { "case": "event then unproven-causality qualifier", "combined": "Qualified event fact.", "split": "Both facts preserved, no false causal link, but the qualifier became a separate memory." },
+      { "case": "third-party claim then unverified qualifier", "combined": "Claim attributed to Maya + unverified status preserved.", "split": "'Deployment completed by Maya' plus a second fact retaining the unresolved pronoun 'her claim'." }
+    ],
+    "conclusion": "Chunk-boundary context loss is the real long-document limitation, not model context size."
+  },
+  "context_limit_probes": {
+    "model": "openai/gpt-oss-20b:nitro via Groq",
+    "probes": [
+      { "chars": 390000, "prompt_tokens": 77942, "elapsed_s": 5.995, "outcome": "accepted", "facts_recovered": "beginning/middle/end all recovered", "cost_usd": 0.00597 },
+      { "chars": 459997, "prompt_tokens": 91713, "elapsed_s": 6.495, "outcome": "accepted", "facts_recovered": "4/5 planted needles; missed an end-of-context causal qualifier and part of one negation", "cost_usd": 0.00708 },
+      { "chars": 599997, "outcome": "rejected before inference", "error": "maximum context length is 131072 tokens; requested about 157012 (154012 text input + 3000 output)" }
+    ],
+    "conclusion": "Extraction recall degrades before the hard context ceiling; the limit covers system prompt + input + reserved output."
+  },
+  "recall_trace": {
+    "note": "Recall invokes no generative LLM; it makes one query-embedding call and one reranker call. Traced with budget=mid, max_tokens=1500, trace=true on the agents bank.",
+    "runs": 9,
+    "queries": 3,
+    "medians_s": { "client_visible": 3.8469, "internal_total": 3.0707, "query_embedding": 0.926, "db_retrieval": 0.0629, "reranking": 2.0405 },
+    "fused_candidate_counts_range": [487, 709]
+  },
+  "reranker_latency": {
+    "method": "5 runs per model on the identical 300-document real candidate pool (direct OpenRouter /v1/rerank)",
+    "results": [
+      { "model": "cohere/rerank-4-pro", "median_s": 1.3936, "range_s": [1.3015, 2.0255], "cost_usd_per_call": 0.0075 },
+      { "model": "cohere/rerank-4-fast", "median_s": 1.0236, "range_s": [1.0104, 1.0455], "cost_usd_per_call": 0.006 },
+      { "model": "cohere/rerank-v3.5", "median_s": 0.996, "range_s": [0.9451, 1.0869], "cost_usd_per_call": 0.003 }
+    ]
+  },
+  "reranker_quality_clean": {
+    "method": "6 labeled cases (current-vs-stale settings, paths, negation/attribution, unproven causality, corrected dates, current-vs-previous model), each padded to 300 documents with synthetic neutral distractors; 1 call per model per case",
+    "results": [
+      { "model": "cohere/rerank-4-pro", "mean_ndcg10": 0.8943, "top1_relevant": "5/6", "mean_mrr": 0.9167, "median_s": 1.1087 },
+      { "model": "cohere/rerank-4-fast", "mean_ndcg10": 0.8651, "top1_relevant": "4/6", "mean_mrr": 0.8333, "median_s": 0.8018 },
+      { "model": "cohere/rerank-v3.5", "mean_ndcg10": 0.8451, "top1_relevant": "4/6", "mean_mrr": 0.8333, "median_s": 0.74 }
+    ],
+    "key_finding": "On the unproven-causality case, rerank-4-fast ranked the explicit causal claim above documents saying causation was unproven; rerank-4-pro did not. All three models ranked a stale 'currently uses v3.5' statement top-1 on the current-reranker case: rerankers score relevance, not truth.",
+    "discarded_methodology": "An earlier quality run padded pools with real memories from the live bank while assigning them grade 0; relevant-but-ungraded distractors invalidated the scores. It was replaced by the neutral-pool method above and must not be reintroduced."
+  },
+  "candidate_caps_direct": {
+    "note": "Direct rerank calls on the first N documents of the same 300-document pool, 3 runs per cell",
+    "cohere/rerank-4-pro": { "50": { "median_s": 1.5356, "cost_usd": 0.0025 }, "100": { "median_s": 1.6912, "cost_usd": 0.0025 }, "200": { "median_s": 2.0041, "cost_usd": 0.005 }, "300": { "median_s": 2.1373, "cost_usd": 0.0075 } },
+    "cohere/rerank-4-fast": { "50": { "median_s": 1.5096, "cost_usd": 0.002 }, "100": { "median_s": 1.5179, "cost_usd": 0.002 }, "200": { "median_s": 1.58, "cost_usd": 0.004 }, "300": { "median_s": 1.735, "cost_usd": 0.006 } },
+    "cohere/rerank-v3.5": { "50": { "median_s": 1.4311, "cost_usd": 0.001 }, "100": { "median_s": 1.4597, "cost_usd": 0.001 }, "200": { "median_s": 1.5723, "cost_usd": 0.002 }, "300": { "median_s": 1.6596, "cost_usd": 0.003 } },
+    "conclusion": "Lowering HINDSIGHT_API_RERANKER_MAX_CANDIDATES from 300 to 100 saves ~0.45s and two-thirds of rerank cost, but bank-level quality at lower caps was not validated."
+  },
+  "production_rollout": {
+    "date": "2026-08-30",
+    "change": "Retain-only model switch in the startup script: HINDSIGHT_API_RETAIN_LLM_MODEL=openai/gpt-oss-20b:nitro, HINDSIGHT_API_RETAIN_LLM_REASONING_EFFORT=low, HINDSIGHT_API_RETAIN_LLM_EXTRA_BODY={\"provider\":{\"require_parameters\":true}}",
+    "verification": [
+      "Running-image source confirmed HINDSIGHT_API_RETAIN_LLM_REASONING_EFFORT exists and resolves before the global effort (memory_engine.py: retain_llm_reasoning_effort or llm_reasoning_effort)",
+      "Startup script executed; health returned healthy/database connected",
+      "Logs: retain initialized as openai/gpt-oss-20b:nitro reasoning_effort=low; reflect/consolidation remain z-ai/glm-5.3-flash reasoning_effort=high; OpenRouter connection verified",
+      "Dry-run extraction: 349-char adversarial sample 5/5 facts in 1.737s; 20,731-char multi-chunk sample recovered beginning/middle/end facts in 1.416s",
+      "Telemetry: GPT-OSS retain chunks 1.02-1.57s versus immediately preceding GLM retain calls 9.6-19.4s"
+    ],
+    "notes": "low reasoning still emits a small number of reasoning tokens (~10-190 per call); it reduces rather than disables reasoning. effort=none is rejected by the endpoint."
+  },
+  "decisions": {
+    "retain_model": "openai/gpt-oss-20b:nitro with low reasoning (~9x faster than the live GLM baseline, half the per-call cost, passed the adversarial set with one documented qualifier-omission trade-off)",
+    "reranker": "keep cohere/rerank-4-pro (best measured relevance; Fast saves only ~0.4s of a 3.85s recall and regressed on causality qualification)",
+    "candidate_cap": "leave at 300 pending a quality-validated cap sweep",
+    "chunk_size": "leave at 3000 chars; the long-document limitation is boundary context, not context size"
+  }
+}

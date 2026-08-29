@@ -1,0 +1,50 @@
+{
+  "retain_matrix": [
+    {
+      "label": "glm-high",
+      "model": "z-ai/glm-5.3-flash",
+      "reasoning": { "effort": "high", "exclude": true },
+      "expected": "pass"
+    },
+    {
+      "label": "glm-none",
+      "model": "z-ai/glm-5.3-flash",
+      "reasoning": { "effort": "none", "exclude": true },
+      "expected": "skip-reasoning-mandatory"
+    },
+    {
+      "label": "gpt-oss-20b-low",
+      "model": "openai/gpt-oss-20b",
+      "reasoning": { "effort": "low", "exclude": true },
+      "expected": "pass"
+    },
+    {
+      "label": "gpt-oss-120b-low",
+      "model": "openai/gpt-oss-120b",
+      "reasoning": { "effort": "low", "exclude": true },
+      "expected": "pass"
+    },
+    {
+      "label": "gemini-2.5-flash-lite",
+      "model": "google/gemini-2.5-flash-lite",
+      "reasoning": null,
+      "expected": "partial"
+    },
+    {
+      "label": "mistral-small-3.2",
+      "model": "mistralai/mistral-small-3.2-24b-instruct",
+      "reasoning": null,
+      "expected": "unreliable"
+    }
+  ],
+  "journal_default": {
+    "model": "openai/gpt-oss-20b:nitro",
+    "reasoning": { "effort": "low", "exclude": true }
+  },
+  "boundary_default": {
+    "model": "openai/gpt-oss-20b:nitro",
+    "reasoning": { "effort": "low", "exclude": true }
+  },
+  "rerankers": ["cohere/rerank-4-pro", "cohere/rerank-4-fast", "cohere/rerank-v3.5"],
+  "candidate_caps": [50, 100, 200, 300]
+}

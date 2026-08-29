@@ -8,3 +8,8 @@ dist/
 .cherry-hillclimb.env
 __pycache__/
 *.pyc
+
+# hindsight-bench: never commit generated artifacts or local env/config
+tools/hindsight-bench/artifacts/
+.env
+.env.local

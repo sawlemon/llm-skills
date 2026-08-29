@@ -1,0 +1,117 @@
+{
+  "description": "Sanitized live recall trace from a Hindsight v0.9.2 instance (2026-08-29). All memory text, query text, and result bodies removed; only phase timings, candidate counts, and summary metrics remain.",
+  "query_sha256": "301cec66d0660bb9d3e069e10d9ca4328cca5010db3dab2ecdc37f8c81e815ec",
+  "request": {
+    "budget": "mid",
+    "max_tokens": 1500,
+    "trace": true
+  },
+  "summary": {
+    "total_nodes_visited": 300,
+    "total_nodes_pruned": 0,
+    "entry_points_found": 10,
+    "budget_used": 300,
+    "budget_remaining": 0,
+    "total_duration_seconds": 3.9919168949127197,
+    "results_returned": 19,
+    "temporal_links_followed": 0,
+    "semantic_links_followed": 0,
+    "entity_links_followed": 0,
+    "phase_metrics": [
+      {
+        "phase_name": "backend_acquisition",
+        "duration_seconds": 1.2159347534179688e-5,
+        "details": {}
+      },
+      {
+        "phase_name": "generate_query_embedding",
+        "duration_seconds": 1.7107470035552979,
+        "details": {}
+      },
+      {
+        "phase_name": "parallel_retrieval",
+        "duration_seconds": 0.11893439292907715,
+        "details": {
+          "semantic_count": 116,
+          "bm25_count": 274,
+          "graph_count": 565,
+          "temporal_count": 0
+        }
+      },
+      {
+        "phase_name": "retrieval_temporal_extraction",
+        "duration_seconds": 0.001104116439819336,
+        "details": {
+          "diagnostic": true
+        }
+      },
+      {
+        "phase_name": "rrf_merge",
+        "duration_seconds": 0.0035653114318847656,
+        "details": {
+          "candidates_merged": 689
+        }
+      },
+      {
+        "phase_name": "hydrate_results",
+        "duration_seconds": 2.8133392333984375e-5,
+        "details": {
+          "candidates": 300
+        }
+      },
+      {
+        "phase_name": "reranking",
+        "duration_seconds": 2.1211819648742676,
+        "details": {
+          "reranker_type": "cross-encoder",
+          "candidates_reranked": 300
+        }
+      },
+      {
+        "phase_name": "combined_scoring",
+        "duration_seconds": 0.004585981369018555,
+        "details": {
+          "candidates_scored": 300
+        }
+      },
+      {
+        "phase_name": "token_filtering",
+        "duration_seconds": 0.013869762420654297,
+        "details": {
+          "results_selected": 19,
+          "tokens_used": 1491,
+          "max_tokens": 1500,
+          "truncated": true
+        }
+      },
+      {
+        "phase_name": "result_serialization",
+        "duration_seconds": 0.005667448043823242,
+        "details": {
+          "results_serialized": 19
+        }
+      },
+      {
+        "phase_name": "entity_build",
+        "duration_seconds": 0.005469560623168945,
+        "details": {
+          "entities_returned": 28
+        }
+      },
+      {
+        "phase_name": "semaphore_wait",
+        "duration_seconds": 2.5272369384765625e-5,
+        "details": {
+          "diagnostic": true
+        }
+      },
+      {
+        "phase_name": "trace_finalize",
+        "duration_seconds": 0.004542112350463867,
+        "details": {
+          "diagnostic": true
+        }
+      }
+    ]
+  }
+}

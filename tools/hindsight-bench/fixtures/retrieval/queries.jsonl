@@ -1,0 +1,3 @@
+{"case_id": "model_stack", "synthetic": true, "query": "What is the current model stack of the memory service?"}
+{"case_id": "wal_repair", "synthetic": true, "query": "What procedure repaired the database corruption incident?"}
+{"case_id": "live_vs_rollback", "synthetic": true, "query": "Which data directory is live and which is rollback-only?"}

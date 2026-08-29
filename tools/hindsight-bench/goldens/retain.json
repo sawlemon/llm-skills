@@ -1,0 +1,266 @@
+{
+  "synthetic": true,
+  "note": "Golden criteria and reference outputs for the retain suites. Reference outputs are verbatim model responses from the 2026-08-30 bake-off, adapted only to the sanitized fixture wording (fictional employer/project/paths). All persons and events are fictional.",
+  "matrix": {
+    "case": {
+      "case_id": "standard_v1",
+      "required": [
+        { "id": "role", "any": ["security consultant", "northwind labs"] },
+        { "id": "final_deadline", "any": ["september 6", "2026-09-06"] },
+        { "id": "latency_claim", "all": ["14 second", "12"] },
+        { "id": "retention_undecided", "any": ["not chosen", "has not chosen", "considering"] },
+        { "id": "maya_attribution", "all": ["maya", "small model", "opinion"] },
+        { "id": "secret_rule", "all": ["api key", "never"] },
+        { "id": "restart_success", "all": ["reranker", "no data loss"] },
+        { "id": "hypothesis_mentioned", "all": ["reasoning effort"] },
+        {
+          "id": "cause_unproven",
+          "any": ["not been proven", "not proven", "unproven", "not been established", "unproven"]
+        },
+        { "id": "live_path_current", "any": ["live-db-new"] },
+        { "id": "rollback_note", "any": ["rollback-only"] }
+      ],
+      "forbidden": [
+        {
+          "id": "stale_deadline_unqualified",
+          "text": "september 5",
+          "unless": ["correct", "final deadline"]
+        },
+        {
+          "id": "stale_path_unqualified",
+          "text": "/srv/appdata/live-db(?!-new)",
+          "regex": true,
+          "unless": ["live-db-new", "rollback-only"]
+        }
+      ]
+    },
+    "reference_outputs": [
+      {
+        "label": "gpt-oss-20b-low",
+        "expected_verdict": "pass",
+        "expected_failed_groups": [],
+        "facts": [
+          { "what": "User works as a Security Consultant at Northwind Labs" },
+          {
+            "what": "User moved the Beacon project demo deadline from September 2 to September 5, 2026, then corrected to September 6, 2026"
+          },
+          {
+            "what": "Memory-service retain calls on the benchmark host average 14 seconds per extraction based on 12 recorded calls"
+          },
+          { "what": "User is considering the Lite model for retain but has not chosen a replacement yet" },
+          {
+            "what": "Colleague Maya believes the Small model would be best for retain, but that is her opinion, not the user's"
+          },
+          { "what": "User instructed never to put API keys or tokens into chat messages" },
+          {
+            "what": "User restarted the memory service yesterday after changing the reranker to the Pro reranker, and the service returned with no data loss"
+          },
+          {
+            "what": "User suspects the slowdown might be caused by high reasoning effort, but the cause has not been proven"
+          },
+          {
+            "what": "User initially said the live database directory was /srv/appdata/live-db, but corrected it to /srv/appdata/live-db-new, with the old path being rollback-only"
+          }
+        ]
+      },
+      {
+        "label": "glm-high",
+        "expected_verdict": "pass",
+        "expected_failed_groups": [],
+        "facts": [
+          { "what": "User works as a Security Consultant at Northwind Labs." },
+          {
+            "what": "User moved the Beacon project demo deadline from September 2 to September 5, 2026; final deadline is September 6, 2026 (correction)."
+          },
+          {
+            "what": "Memory-service retain calls take around 14 seconds per extraction call, based on 12 recorded calls."
+          },
+          {
+            "what": "User is considering the Lite model as a replacement for retain but has not chosen a replacement yet; colleague Maya thinks the Small model would be best (her opinion, not user's)."
+          },
+          { "what": "User's rule: never put API keys or tokens into chat messages." },
+          {
+            "what": "User restarted the memory service after changing the reranker to the Pro reranker, and the service came back with no data loss."
+          },
+          {
+            "what": "The memory-service slowdown might be caused by high reasoning effort, but the cause has not been proven."
+          },
+          {
+            "what": "User initially said the live database directory was /srv/appdata/live-db; correction: the live directory is /srv/appdata/live-db-new, and the old path is rollback-only."
+          }
+        ]
+      },
+      {
+        "label": "gemini-2.5-flash-lite",
+        "expected_verdict": "partial",
+        "expected_failed_groups": ["latency_claim", "maya_attribution", "secret_rule", "cause_unproven"],
+        "facts": [
+          { "what": "User works as a Security Consultant at Northwind Labs." },
+          {
+            "what": "User moved the Beacon project demo deadline from September 2 to September 5, 2026. The final deadline is September 6, 2026."
+          },
+          {
+            "what": "Memory-service retain calls on the benchmark host have recently taken around 14 seconds per extraction call."
+          },
+          { "what": "User is considering the Lite model for retain." },
+          { "what": "Maya thinks the Small model would be best for retain." },
+          {
+            "what": "User restarted the memory service after changing the reranker to the Pro reranker, and the service came back with no data loss."
+          },
+          { "what": "The slowdown in the memory service might be caused by high reasoning effort." },
+          {
+            "what": "The live database directory is /srv/appdata/live-db-new; the old path /srv/appdata/live-db is rollback-only."
+          }
+        ]
+      },
+      {
+        "label": "negative-control-corrupted",
+        "expected_verdict": "fail",
+        "expected_failed_groups": ["maya_attribution", "secret_rule", "cause_unproven"],
+        "facts": [
+          { "what": "User works as a Security Consultant at Northwind Labs" },
+          { "what": "User moved the Beacon project demo deadline to September 6, 2026" },
+          {
+            "what": "Memory-service retain calls average 14 seconds per extraction based on 12 recorded calls"
+          },
+          { "what": "User is considering the Lite model for retain but has not chosen a replacement yet" },
+          { "what": "The user believes the Small model would be best for retain" },
+          {
+            "what": "User restarted the memory service after changing the reranker to the Pro reranker, and the service returned with no data loss"
+          },
+          { "what": "User suspects the slowdown might be caused by high reasoning effort" },
+          {
+            "what": "User initially said the live database directory was /srv/appdata/live-db, but corrected it to /srv/appdata/live-db-new, with the old path being rollback-only"
+          }
+        ]
+      }
+    ]
+  },
+  "adversarial": {
+    "case": {
+      "case_id": "adversarial_v1",
+      "required": [
+        { "id": "tesla_not_user", "any": ["does not own a tesla", "do not own a tesla", "not own a tesla"] },
+        { "id": "arun_owns", "all": ["arun", "model 3"] },
+        { "id": "berlin_mentioned", "any": ["berlin"] },
+        {
+          "id": "berlin_uncertain",
+          "any": ["no decision", "not decided", "have not applied", "has not applied", "not booked"]
+        },
+        { "id": "redis_mentioned", "all": ["redis"] },
+        { "id": "postgres_kept", "any": ["rejected", "keep postgresql"] },
+        { "id": "final_due_date", "any": ["september 3", "2026-09-03"] },
+        { "id": "medical_qualifier", "all": ["normal"] },
+        { "id": "medical_not_diagnosis", "any": ["not a diagnosis"] },
+        { "id": "timeout_event", "all": ["timeout"] },
+        { "id": "causality_unproven", "any": ["not established", "not proven", "unproven", "suspicious"] },
+        { "id": "dashboard_temporary", "all": ["dashboard"] },
+        { "id": "dashboard_not_permanent", "any": ["not a permanent", "this version", "current version"] },
+        { "id": "falcon_disambiguated", "all": ["falcon"] },
+        { "id": "falcon_internal", "any": ["does not refer", "internal cloud-security demo"] },
+        { "id": "maya_mentioned", "all": ["maya"] },
+        { "id": "maya_unverified", "any": ["not independently verified", "unverified", "not verified"] }
+      ],
+      "forbidden": [
+        {
+          "id": "false_cause_asserted",
+          "text": "timeout change caused the api errors",
+          "unless": ["not", "unproven"]
+        },
+        { "id": "stale_audit_date_unqualified", "text": "august 31", "unless": ["correct", "moved"] }
+      ]
+    },
+    "reference_outputs": [
+      {
+        "label": "glm-high",
+        "expected_verdict": "pass",
+        "expected_failed_groups": [],
+        "facts": [
+          { "what": "User does not own a Tesla; user's brother Arun owns a blue Tesla Model 3." },
+          {
+            "what": "User might move to Berlin next year (2027), but has made no decision and has not applied for a visa."
+          },
+          {
+            "what": "User rejected the assistant's suggestion to replace PostgreSQL with Redis and will keep PostgreSQL."
+          },
+          {
+            "what": "The client moved the final audit due date to September 3, 2026, correcting the earlier stated date of August 31, 2026."
+          },
+          {
+            "what": "Dr. Chen told the user their blood test was within the normal range, but explicitly stated this was not a diagnosis."
+          },
+          {
+            "what": "The API began returning errors after the user changed the timeout from 30 to 10 seconds; the timing is suspicious but causation has not been established."
+          },
+          {
+            "what": "User disliked the dashboard colors during today's demo, but this is feedback on this version only, not a permanent preference."
+          },
+          {
+            "what": "Project Falcon is the user's internal cloud-security demo, and does not refer to the Falcon endpoint-security product."
+          },
+          {
+            "what": "Maya said the deployment was complete, but the user has not independently verified her claim."
+          }
+        ]
+      },
+      {
+        "label": "gpt-oss-20b-low",
+        "expected_verdict": "partial",
+        "expected_failed_groups": ["causality_unproven"],
+        "note": "The original session scoring flagged tesla_attribution and causality_unproven here. Manual review confirmed tesla_attribution was a scoring artifact (correctly split facts). The causality flag was real but subtle: the model omitted the unproven-causation qualifier sentence entirely while also never asserting causation. The historical manual review accepted that trade-off; these criteria count the omitted qualifier as a miss.",
+        "facts": [
+          { "what": "User does not own a Tesla" },
+          { "what": "User's brother Arun owns a blue Model 3" },
+          { "what": "User might move to Berlin next year but has not decided or applied for a visa" },
+          {
+            "what": "User rejected assistant's suggestion to replace PostgreSQL with Redis and will keep PostgreSQL"
+          },
+          {
+            "what": "User said audit due August 31 on August 20, but client moved final due date to September 3, 2026"
+          },
+          { "what": "Dr. Chen told user blood test was within normal range but not a diagnosis" },
+          { "what": "API errors began after user changed the timeout from 30 to 10 seconds" },
+          {
+            "what": "User disliked dashboard colors during today's demo, but it is feedback on this version only"
+          },
+          {
+            "what": "Project Falcon is an internal cloud-security demo and does not refer to the Falcon endpoint-security product"
+          },
+          { "what": "Maya said deployment was complete but user has not independently verified the claim" }
+        ]
+      },
+      {
+        "label": "gemini-2.5-flash-lite",
+        "expected_verdict": "partial",
+        "expected_failed_groups": ["causality_unproven"],
+        "facts": [
+          { "what": "User does not own a Tesla." },
+          { "what": "User's brother Arun owns a blue Model 3." },
+          {
+            "what": "User is considering moving to Berlin next year, but has made no decision and has not applied for a visa."
+          },
+          {
+            "what": "User rejected the assistant's suggestion to replace PostgreSQL with Redis and will keep PostgreSQL."
+          },
+          { "what": "User stated the audit was due August 31." },
+          { "what": "The client moved the final audit due date to September 3, 2026." },
+          {
+            "what": "Dr. Chen stated user's blood test was within the normal range, but explicitly stated it was not a diagnosis."
+          },
+          {
+            "what": "The API began returning errors after the user changed the timeout from 30 to 10 seconds."
+          },
+          {
+            "what": "User disliked the dashboard colors during today's demo, providing feedback on the current version."
+          },
+          {
+            "what": "Project Falcon is an internal cloud-security demo and does not refer to the Falcon endpoint-security product."
+          },
+          {
+            "what": "Maya stated the deployment was complete, but the user has not independently verified this claim."
+          }
+        ]
+      }
+    ]
+  }
+}

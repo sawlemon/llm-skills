@@ -1,0 +1,19 @@
+{
+  "note": "Model context windows and the recorded context-limit probes from 2026-08-30. probe.input_tokens is the full text input as counted by the provider (system prompt included). accepted=false means the provider rejected the request with a context-length 400 before inference. Numbers are recorded observations; windows change over time - re-probe before relying on them.",
+  "filler_chars_per_token": 4.0,
+  "system_prompt_tokens": 3400,
+  "models": {
+    "openai/gpt-oss-20b": { "context_tokens": 131072 },
+    "openai/gpt-oss-120b": { "context_tokens": 131072 },
+    "z-ai/glm-5.3-flash": { "context_tokens": 1310720 },
+    "google/gemini-2.5-flash-lite": { "context_tokens": 1048576 },
+    "mistralai/mistral-small-3.2-24b-instruct": { "context_tokens": 131072 }
+  },
+  "probes": {
+    "openai/gpt-oss-20b": [
+      { "label": "accepted-390k-chars", "input_tokens": 77942, "accepted": true },
+      { "label": "accepted-460k-chars", "input_tokens": 91713, "accepted": true },
+      { "label": "rejected-600k-chars", "input_tokens": 154012, "accepted": false }
+    ]
+  }
+}

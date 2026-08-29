@@ -1,0 +1,50 @@
+{
+  "synthetic": true,
+  "note": "Coverage aliases for the 12 planted needle facts. Each group passes if ANY alias appears in the joined extracted-fact text; aliases are deliberately generous so that correct-but-reworded or correctly-split extractions (the manual-review corrections from the 2026-08-30 session) count as covered.",
+  "groups": [
+    {
+      "id": "project_cedar",
+      "needle_substring": "Project Cedar",
+      "any": ["project cedar", "reading tracker"]
+    },
+    { "id": "bicycle_attribution", "needle_substring": "red bicycle", "any": ["leena", "red bicycle"] },
+    {
+      "id": "postgres_rejected_redis",
+      "needle_substring": "rejected Redis",
+      "any": ["keep postgresql", "rejected redis", "postgres"]
+    },
+    {
+      "id": "dentist_date",
+      "needle_substring": "dentist appointment",
+      "any": ["october 14", "2026-10-14", "dentist"]
+    },
+    { "id": "kyoto_uncertain", "needle_substring": "visiting Kyoto", "any": ["kyoto", "not booked"] },
+    { "id": "cloud_budget", "needle_substring": "cloud budget", "any": ["45", "cloud budget", "budget"] },
+    {
+      "id": "medical_qualifier",
+      "needle_substring": "Dr. Raman",
+      "any": ["raman", "not a diagnosis", "normal"]
+    },
+    {
+      "id": "api_key_rule",
+      "needle_substring": "API key must never",
+      "any": ["api key", "never", "must not"]
+    },
+    {
+      "id": "corrected_review_date",
+      "needle_substring": "November 6",
+      "any": ["november 6", "2026-11-06", "november 2"]
+    },
+    {
+      "id": "migration_no_loss",
+      "needle_substring": "completed the migration",
+      "any": ["migration", "no records were lost", "no data loss", "august 28"]
+    },
+    { "id": "maya_opinion", "needle_substring": "Maya believes", "any": ["maya", "blue design", "opinion"] },
+    {
+      "id": "causality_unproven",
+      "needle_substring": "causation has not been established",
+      "any": ["timeout", "causation", "not been established"]
+    }
+  ]
+}

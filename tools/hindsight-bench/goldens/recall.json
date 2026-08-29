@@ -1,0 +1,22 @@
+{
+  "note": "Expected values for parsing the sanitized recall trace fixture, plus the sanitized live recall queries used by the 2026-08-30 latency runs. Phase values are non-diagnostic durations in seconds from the recorded trace.",
+  "sample_trace": {
+    "phases": {
+      "generate_query_embedding": 1.710747,
+      "parallel_retrieval": 0.118934,
+      "rrf_merge": 0.003565,
+      "reranking": 2.121182,
+      "combined_scoring": 0.004586,
+      "token_filtering": 0.01387,
+      "result_serialization": 0.005667
+    },
+    "total_duration_seconds": 3.991917,
+    "results_returned": 19,
+    "counts": { "semantic": 116, "bm25": 274, "graph": 565, "temporal": 0 }
+  },
+  "live_queries": [
+    "What is the current model stack of the memory service?",
+    "What procedure repaired the database corruption incident?",
+    "Which data directory is live and which is rollback-only?"
+  ]
+}

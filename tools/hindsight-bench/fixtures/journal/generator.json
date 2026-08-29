@@ -1,0 +1,27 @@
+{
+  "synthetic": true,
+  "note": "Generator for the long synthetic journal. Needle facts are fictional and are placed at fractional positions of the target length; filler sentences are deliberately fact-free. The generated journal is NOT committed - it is rebuilt deterministically at run time.",
+  "target_chars": 180000,
+  "needle_positions": [0.01, 0.08, 0.16, 0.25, 0.34, 0.43, 0.52, 0.61, 0.7, 0.79, 0.88, 0.96],
+  "needle_facts": [
+    "On January 12, 2026, I started Project Cedar, a personal reading tracker.",
+    "My sister Leena owns the red bicycle; I do not own it.",
+    "I decided to keep PostgreSQL for the journal archive and rejected Redis.",
+    "The dentist appointment is scheduled for October 14, 2026 at 9:30 AM.",
+    "I am considering visiting Kyoto next spring, but I have not booked anything.",
+    "My monthly cloud budget is capped at 45 US dollars.",
+    "Dr. Raman said the screening result was normal but explicitly said it was not a diagnosis.",
+    "The production API key must never be pasted into chat or stored in journal summaries.",
+    "The client moved the final review date from November 2 to November 6, 2026.",
+    "I completed the migration on August 28, 2026 and verified that no records were lost.",
+    "Maya believes the blue design is better; that is Maya's opinion, not mine.",
+    "The service errors appeared after the timeout changed, but causation has not been established."
+  ],
+  "filler_sentences": [
+    "I spent some time reflecting on the ordinary rhythm of the day and wrote down small details so I could remember the sequence later.",
+    "The morning was quiet, and I reviewed a few notes, answered routine messages, and organized material that had accumulated during the week.",
+    "Nothing in this paragraph changes a plan, records a preference, names a deadline, or establishes a new relationship.",
+    "I paused between topics to describe the weather, the room, and the general feeling of moving through a long list of mundane tasks.",
+    "These sentences are neutral journal filler and contain no durable fact beyond the fact that the writer continued speaking."
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "_comment": "Copy to a local (git-ignored) file and fill in real values. Never commit live endpoints or keys; OPENROUTER_API_KEY is read from the environment, not from config.",
+  "mode": "live",
+  "hindsight_url": "http://REPLACE-ME:8888",
+  "hindsight_bank": "bench_REPLACE_WITH_RUN_ID",
+  "openrouter_base": "https://openrouter.ai/api/v1",
+  "runs": 3,
+  "concurrency": 8,
+  "timeout_seconds": 180,
+  "candidate_caps": [50, 100, 200, 300]
+}

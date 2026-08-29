@@ -18,6 +18,7 @@ skills/
   search/SKILL.md
 tools/
   cherry-hillclimb/         daily prompt hill-climbing harness for a Cherry Studio assistant (see below)
+  hindsight-bench/          reproducible Hindsight retain/recall/reranker benchmark suite (see below)
 prompts/
   cherry-studio/<slug>/     current.md, candidate.md, history/, CHANGELOG.md per assistant (cherry-hillclimb output)
 reports/
@@ -97,6 +98,23 @@ this isn't simply the first model Cherry Studio's API server reports). The evide
 twice — once by the analyzer persona's instructions, once programmatically in `analyze.mjs`, which drops
 any "confirmed" learning whose quoted evidence cannot be found verbatim in the extracted transcript before
 it's allowed to justify a prompt edit.
+
+## Hindsight benchmark suite
+
+`tools/hindsight-bench/` is a Python-stdlib benchmark harness for Hindsight memory
+operations and OpenRouter rerankers, built while selecting the Hindsight model stack
+(retain extraction, long-journal chunking, context limits, recall phase tracing,
+reranker quality/latency, candidate caps). Offline mode is deterministic and needs
+no network or credentials; live suites are gated behind explicit flags and cost
+money. The measured 2026-08-29/30 results live in the suite's
+[`reports/`](tools/hindsight-bench/reports/2026-08-29-30-historical-results.md).
+
+```bash
+cd tools/hindsight-bench
+python3 hindsight_bench.py validate
+python3 hindsight_bench.py run --mode offline --suite all
+python3 -m unittest discover -s tests -t . -v
+```
 
 ## Commands
 
