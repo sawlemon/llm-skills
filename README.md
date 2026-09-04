@@ -16,6 +16,7 @@ skills/
   hill-climb/SKILL.md
   hinsighter/SKILL.md
   search/SKILL.md
+  ssd-backup/SKILL.md
 tools/
   cherry-hillclimb/         daily prompt hill-climbing harness for a Cherry Studio assistant (see below)
   hindsight-bench/          reproducible Hindsight retain/recall/reranker benchmark suite (see below)
@@ -60,6 +61,15 @@ Point a tool's system prompt at a `skills/*/SKILL.md` file to apply that behavio
   tool surface (`memoryRecall`, `memoryRetain`, `memorySyncRetain`, `memoryReflect`), the required
   `bank_id` on every call, bank definitions, decision gates for _should I recall / reflect / retain_,
   tagging conventions, and hard prohibitions (never store credentials, never fabricate a recall).
+- **`ssd-backup/`** — backs up media from `~/Downloads` on the `hplaptop` host to a `Movies Backup`
+  folder on an external USB SSD, then ejects it. Unlike the other entries this is an operational skill,
+  not a persona: `scripts/ssd-backup.sh` is streamed to the host over `ssh bash -s` and does the whole
+  run — mount by filesystem UUID, additive `rsync --ignore-existing` copy with no `--delete`, `sync`,
+  unmount, power-off. The guardrails are in the script rather than in prose, because the drive holds the
+  only copy of the data: it refuses to write unless the expected UUID is mounted read-write, never
+  formats/repairs/deletes/overwrites, never removes source files, unmounts on any unexpected exit, and
+  leaves checksum verification opt-in (`--verify`) since re-reading every byte wears the SSD. Documents
+  the one-time polkit rule that lets `udisksctl` mount and eject from a non-interactive SSH session.
 - **`search/`** — a factual search assistant persona. Accuracy first: never fabricate facts, statistics,
   names, dates, quotes, or sources; cross-check before answering; prefer primary/peer-reviewed/official
   sources and name them; admit uncertainty outright; lead with the answer; flag when information may be
