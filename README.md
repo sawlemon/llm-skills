@@ -74,6 +74,10 @@ Point a tool's system prompt at a `skills/*/SKILL.md` file to apply that behavio
   names, dates, quotes, or sources; cross-check before answering; prefer primary/peer-reviewed/official
   sources and name them; admit uncertainty outright; lead with the answer; flag when information may be
   outdated or contested. Also carries auto-recall/auto-store memory rules.
+- **`critic/`** — a read-only reviewer for completed code, websites, documents, writing, and prompts.
+  Scores professional readiness out of 10 and returns only evidence-backed improvements, ordered by
+  impact. It requires rendered inspection for work whose presentation or interaction affects quality and
+  refuses to score when required visual evidence is unavailable.
 
 ## Cherry Studio prompt hill-climbing
 
