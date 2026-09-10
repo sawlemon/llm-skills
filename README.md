@@ -78,6 +78,10 @@ Point a tool's system prompt at a `skills/*/SKILL.md` file to apply that behavio
   Scores professional readiness out of 10 and returns only evidence-backed improvements, ordered by
   impact. It requires rendered inspection for work whose presentation or interaction affects quality and
   refuses to score when required visual evidence is unavailable.
+- **`big-brain/`** — an explicitly invoked orchestration mode that preserves the main top-tier model for
+  critical decisions while delegating token-heavy exploration and consolidation to Luna, and code or
+  reasoning-heavy execution to Sonnet. It requires complete task contracts, parallelizes independent work,
+  and keeps final review and responsibility with the main model.
 
 ## Cherry Studio prompt hill-climbing
 
