@@ -49,14 +49,17 @@ Point a tool's system prompt at a `skills/*/SKILL.md` file to apply that behavio
     instruction file but the exact system prompt sent to an LLM by `tools/cherry-hillclimb/analyze.mjs`
     (see "Cherry Studio prompt hill-climbing" below). Analyzes one Cherry Studio assistant's own recent
     chat history and proposes a justified edit to its own system prompt.
-  - `zcode-learning-extraction.md` — the ZCode variant: audits **ZCode** session transcripts, which live
-    in a local SQLite database (`~/.zcode/cli/db/db.sqlite`, tables `session`/`message`/`part`) rather
-    than date-foldered JSONL, and merges durable, gated, evidenced learnings into `~/.zcode/AGENTS.md`
-    (capped at 100 lines) plus `~/.zcode/docs/`. Runs every 2 days via a ZCode scheduled automation;
-    excludes its own automation runs by joining against `automation_runs.session_id` in
-    `~/.zcode/v2/tasks-index.sqlite`, and strips ZCode-specific injected noise (TodoWrite reminders,
-    `userselect` IDE pastes, `[$skill](path)` prefixes, `<scheduled-task>` wrappers). The file's trailing
-    "Deployment notes" section documents the exact schedule and automation prompt used to redeploy it.
+  - `zcode-learning-extraction.md` — the ZCode variant: audits **ZCode** session transcripts stored in a
+    local SQLite database (`~/.zcode/cli/db/db.sqlite`) and merges durable, gated, evidenced learnings
+    into `~/.zcode/AGENTS.md` (capped at 100 lines) plus `~/.zcode/docs/`. Runs every 2 days via a ZCode
+    scheduled automation with `injectAgentsMd: false`. The transactional runner at
+    `skills/hill-climb/scripts/zcode_learning_extractor.py` handles session discovery, evidence
+    normalization, staging, validation, backup, commit, recovery, lock management, and deployment
+    checking. Both SQLite databases are opened read-only; evidence is hash-pinned and bound to
+    runner-controlled trusted state outside the agent-editable run directory; every live write is
+    preflighted, validated, and backed up before the watermark advances. The runner is recoverable, not
+    atomic. See the prompt's deployment appendix, the runner's module docstring, and
+    `tests/test_zcode_learning_extractor.py` (122 tests) for the full trust model.
 - **`hinsighter/`** — the detailed operating protocol for the Hindsight MCP memory server. Documents the
   tool surface (`memoryRecall`, `memoryRetain`, `memorySyncRetain`, `memoryReflect`), the required
   `bank_id` on every call, bank definitions, decision gates for _should I recall / reflect / retain_,
