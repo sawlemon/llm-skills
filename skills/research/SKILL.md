@@ -1,6 +1,9 @@
 ---
 name: research
-description: Research a question using high-trust primary sources and return a concise cited answer. Use when the user asks to investigate a topic, gather documentation facts, compare sources, or do research.
+description: Research a question using high-trust primary sources and return a
+  concise cited answer. Use when the user asks to investigate a topic, gather
+  documentation facts, compare sources, or do research.
+disabled: true
 ---
 
 # Research
