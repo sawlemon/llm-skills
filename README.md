@@ -12,10 +12,13 @@ that maintains some of them.
 
 ```
 skills/
-  alfred/SKILL.md
+  big-brain/SKILL.md
+  critic/SKILL.md
+  grill-me/SKILL.md
+  grilling/SKILL.md
   hill-climb/SKILL.md
-  hinsighter/SKILL.md
-  search/SKILL.md
+  i-have-adhd/SKILL.md
+  research/SKILL.md
 tools/
   cherry-hillclimb/         daily prompt hill-climbing harness for a Cherry Studio assistant (see below)
   hindsight-bench/          reproducible Hindsight retain/recall/reranker benchmark suite (see below)
@@ -29,11 +32,6 @@ reports/
 
 Point a tool's system prompt at a `skills/*/SKILL.md` file to apply that behavior.
 
-- **`alfred/`** — baseline behavior rules applied to every conversation, whatever the topic. Three rules:
-  route all long-term memory through the Hindsight MCP server (including bank selection across `health`,
-  `career`, `finances`, `work`, `default`), keep output concise and free of preamble, and stay
-  epistemically honest — search before guessing, label speculation, and say "I don't know" when that is
-  the truthful answer.
 - **`hill-climb/`** — daily learning-extraction personas.
   - `daily-claude-to-codex-learning-extraction.md` — audits Claude Code session transcripts
     (`~/.claude/projects/**`) and merges durable, gated, evidenced learnings into a small always-on map
@@ -59,14 +57,6 @@ Point a tool's system prompt at a `skills/*/SKILL.md` file to apply that behavio
     preflighted, validated, and backed up before the watermark advances. The runner is recoverable, not
     atomic. See the prompt's deployment appendix, the runner's module docstring, and
     `tests/test_zcode_learning_extractor.py` (121 tests) for the full trust model.
-- **`hinsighter/`** — the detailed operating protocol for the Hindsight MCP memory server. Documents the
-  tool surface (`memoryRecall`, `memoryRetain`, `memorySyncRetain`, `memoryReflect`), the required
-  `bank_id` on every call, bank definitions, decision gates for _should I recall / reflect / retain_,
-  tagging conventions, and hard prohibitions (never store credentials, never fabricate a recall).
-- **`search/`** — a factual search assistant persona. Accuracy first: never fabricate facts, statistics,
-  names, dates, quotes, or sources; cross-check before answering; prefer primary/peer-reviewed/official
-  sources and name them; admit uncertainty outright; lead with the answer; flag when information may be
-  outdated or contested. Also carries auto-recall/auto-store memory rules.
 - **`critic/`** — a read-only reviewer for completed code, websites, documents, writing, and prompts.
   Scores professional readiness out of 10 and returns only evidence-backed improvements, ordered by
   impact. It requires rendered inspection for work whose presentation or interaction affects quality and
