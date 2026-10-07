@@ -143,10 +143,12 @@ copied verbatim to the deployed path above — see "Deployment notes.")
    target/staged destination/the watermark before touching anything, then backs up every
    live target **and** the watermark (with a manifest of hashes for later verification),
    binds that backup's path/digest/exact inventory into trusted apply state, and only
-   then writes a durable **commit marker** (`run_dir/commit.json`) — before this point no
-   live file has been touched at all. It applies the staged files, and — only after every
-   staged file has been written — advances `~/.zcode/self-improve/watermark.json` to the
-   run's upper bound. It then flips the commit marker to `completed` and prunes old run
+   then writes a durable **commit record** into trusted control state (mirrored to
+   `run_dir/commit.json` for display only) — before this point no live file has been
+   touched at all. It applies exactly the staged bytes it just validated (anything edited
+   in staging after `commit` starts is ignored), and — only after every staged file has
+   been written — advances `~/.zcode/self-improve/watermark.json` to the trusted upper
+   bound. It then flips the commit record to `completed` and prunes old run
    dirs/backups (keep the newest 5 by default, tune with `--keep N`). On validation
    failure it applies nothing and prints the errors so you can fix staging and re-run
    `commit`. To inspect before writing, run `validate --run-id <id>` and review
@@ -157,13 +159,14 @@ copied verbatim to the deployed path above — see "Deployment notes.")
    replacing it, or editing an earlier entry in place all fail validation; only appending
    a new block is allowed.
 5. **This is a recoverable commit, not an atomic one.** If the process is interrupted
-   after `commit`/`apply` starts writing, the commit marker stays `in_progress` on disk —
+   after `commit`/`apply` starts writing, the commit record stays `in_progress` on disk —
    `prepare` for a new run will refuse to start until you run `recover --run-id <id>`.
-   `recover` is **state-aware and idempotent**, never a blind restore, and requires a
-   present, well-formed, run-matching commit marker with a recognized status before it
-   acts at all — a missing, malformed, run-id-mismatched, or unrecognized-status marker
-   fails closed with no filename-based fallback search for a plausibly-named backup ever
-   attempted. It also requires the run's trusted control state to still exist (a legacy
+   `recover` is **state-aware and idempotent**, never a blind restore, and decides only
+   from the trusted commit record (it rewrites a `run_dir/commit.json` display copy that
+   disagrees, and never takes a status or backup path from it; a run prepared by an older
+   runner instead needs a present, well-formed, run-matching marker there) — a malformed,
+   run-id-mismatched, or unrecognized-status record fails closed with no filename-based
+   fallback search for a plausibly-named backup ever attempted. It also requires the run's trusted control state to still exist (a legacy
    run without it is refused outright) and refuses outright if a *different* run
    currently owns the extraction lock; it is a no-op (only releasing a leftover same-run
    lock, never rolling anything back) for a run whose marker already says `completed` or

@@ -58,7 +58,7 @@ Point a tool's system prompt at a `skills/*/SKILL.md` file to apply that behavio
     runner-controlled trusted state outside the agent-editable run directory; every live write is
     preflighted, validated, and backed up before the watermark advances. The runner is recoverable, not
     atomic. See the prompt's deployment appendix, the runner's module docstring, and
-    `tests/test_zcode_learning_extractor.py` (122 tests) for the full trust model.
+    `tests/test_zcode_learning_extractor.py` (121 tests) for the full trust model.
 - **`hinsighter/`** — the detailed operating protocol for the Hindsight MCP memory server. Documents the
   tool surface (`memoryRecall`, `memoryRetain`, `memorySyncRetain`, `memoryReflect`), the required
   `bank_id` on every call, bank definitions, decision gates for _should I recall / reflect / retain_,

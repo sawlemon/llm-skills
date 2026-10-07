@@ -11,10 +11,12 @@ an auxiliary automation index (``~/.zcode/v2/tasks-index.sqlite``, table
 This runner is a *recoverable* commit protocol, not an atomic one: a crash
 between writing staged files and flipping the run's commit marker to
 ``completed`` can leave a run's live state briefly ambiguous. ``recover`` is
-state-aware -- it requires a present, well-formed, run-matching commit marker
-with a recognized status before acting at all (no filename-based backup
-fallback), restores the pre-run backup only for a run whose marker is
-genuinely unresolved, is idempotent (never restores a ``completed`` or
+state-aware -- it acts only on the run's trusted commit record (kept under
+control state; ``run_dir/commit.json`` is a display copy), or for a run
+prepared before that record existed, a present, well-formed, run-matching
+commit marker (no filename-based backup fallback). It restores the pre-run
+backup only for a run whose commit is genuinely unresolved, is idempotent
+(never restores a ``completed`` or
 already-``recovered`` run a second time, which would silently clobber a
 later run's work), and refuses outright while a *different* run owns the
 extraction lock. Backup restoration itself fails closed: a missing backup,
@@ -68,7 +70,23 @@ from typing import Any
 DISPOSITIONS = {"WROTE_MAP", "WROTE_DOC", "REFINED", "SUPERSEDED", "SKIPPED_DUP", "PROVISIONAL", "REJECTED"}
 WRITE_DISPOSITIONS = {"WROTE_MAP", "WROTE_DOC", "REFINED", "SUPERSEDED"}
 SESSION_DISPOSITION_STATUSES = {"contributed", "reviewed_no_learning"}
-SECRET_RE = re.compile(r"(?i)(?:api[_-]?key|access[_-]?token|token|secret|password|credential)\s*[:=]\s*[\"']?[^\"'\s]{8,}")
+# Credential shapes redacted from normalized evidence and rejected in staged
+# memory. A pattern's optional ``keep`` group survives redaction so the
+# surrounding text stays readable ("api_key=<REDACTED>").
+_SECRET_KEYWORDS = r"(?:api[_-]?key|access[_-]?token|auth[_-]?token|token|secret|password|passwd|credential)"
+SECRET_PATTERNS = (
+    # key=value, key: value, and quoted JSON/YAML keys ("api_key": "value").
+    re.compile(r"(?i)(?P<keep>" + _SECRET_KEYWORDS + r"[\"']?\s*[:=]\s*)[\"']?[^\"'\s]{8,}[\"']?"),
+    re.compile(r"(?i)(?P<keep>\bauthorization[\"']?\s*[:=]\s*[\"']?(?:bearer|basic|token)\s+)[A-Za-z0-9._~+/=-]{8,}"),
+    # A bare bearer token must contain a digit so prose like "Bearer
+    # authentication" is not mistaken for a credential.
+    re.compile(r"(?i)(?P<keep>\bbearer\s+)(?=[A-Za-z0-9._~+/=-]*\d)[A-Za-z0-9._~+/=-]{16,}"),
+    re.compile(r"-----BEGIN (?:[A-Z0-9]+ )*PRIVATE KEY-----[\s\S]*?(?:-----END (?:[A-Z0-9]+ )*PRIVATE KEY-----|\Z)"),
+    re.compile(
+        r"\b(?:sk-(?:proj-|ant-)?[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}"
+        r"|xox[abprs]-[A-Za-z0-9-]{10,}|AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_-]{35})"
+    ),
+)
 POINTER_RE = re.compile(r"(?:^|\s)((?:\./)?docs/[A-Za-z0-9_./-]+)(?:\s|$|\))")
 RUN_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$")
 SCHEDULED_TASK_MARK = "<scheduled-task"
@@ -83,6 +101,9 @@ WATERMARK_FUTURE_SKEW_MS = 5 * 60 * 1000  # allowed clock skew before a checkpoi
 LOCK_META_NAME = "owner.json"
 CONTROL_DIR_REL = "self-improve/extraction-control"
 VALID_MARKER_STATUSES = {"in_progress", "completed", "recovered"}
+# Control records carrying this field keep the authoritative commit status in
+# trusted state; older records fall back to the run directory's commit.json.
+COMMIT_STATE_VERSION = 1
 # Fields that must be byte-for-byte identical between the agent-editable
 # manifest.json and the runner-controlled trusted control record. Anything
 # else in the manifest (e.g. derived report text) is not security-relevant.
@@ -217,8 +238,18 @@ def under(path: Path, root: Path) -> bool:
         return False
 
 
+def _redaction(match: re.Match[str]) -> str:
+    return (match.groupdict().get("keep") or "") + "<REDACTED>"
+
+
 def redact(text: str) -> str:
-    return SECRET_RE.sub(lambda m: m.group(0).split("=", 1)[0].split(":", 1)[0] + "=<REDACTED>", text)
+    for pattern in SECRET_PATTERNS:
+        text = pattern.sub(_redaction, text)
+    return text
+
+
+def contains_secret(text: str) -> bool:
+    return any(pattern.search(text) for pattern in SECRET_PATTERNS)
 
 
 def now_ms() -> int:
@@ -413,9 +444,8 @@ def cmd_unlock_abandoned(args: argparse.Namespace) -> int:
                 "appears to be alive"
             )
         owner_run_id = meta.get("run_id")
-        if owner_run_id:
-            marker = read_json(commit_marker_path(ws.runs / owner_run_id))
-            if marker and marker.get("status") not in ("completed", "recovered"):
+        if owner_run_id and RUN_ID_RE.fullmatch(owner_run_id):
+            if run_has_unresolved_commit(ws, owner_run_id):
                 raise RunError(
                     f"refusing to remove lock: run {owner_run_id!r} has an unresolved commit -- run "
                     f"`recover --run-id {owner_run_id}` instead"
@@ -690,7 +720,7 @@ def discover_sessions(db_path: Path, tasks_db_path: Path, lower: int, upper: int
                     continue
                 if SCHEDULED_TASK_MARK in first_user_text(con, sid):
                     continue
-                session = {"id": sid, "directory": directory, "title": title, "time_updated": updated, "time_created": created}
+                session = {"id": sid, "directory": directory, "title": redact(title) if title else title, "time_updated": updated, "time_created": created}
                 sessions.append(normalize_session(con, session, lower, upper))
             return sessions
         finally:
@@ -821,6 +851,7 @@ def build_authorized_targets(baseline_hashes: dict[str, str], watermark_baseline
 def write_control_record(ws: Workspace, run_id: str, manifest_data: dict[str, Any]) -> None:
     record = {field: manifest_data[field] for field in CONTROL_SENSITIVE_FIELDS}
     record["version"] = 1
+    record["commit_state_version"] = COMMIT_STATE_VERSION
     record["authorized_targets"] = build_authorized_targets(manifest_data["baseline_hashes"], manifest_data["watermark_baseline"])
     control_dir = control_dir_for(ws, run_id)
     ensure_control_dir(control_dir)
@@ -930,6 +961,27 @@ def staged_files(staging: Path) -> set[str]:
     return files
 
 
+def read_staged_payloads(staging: Path) -> dict[str, bytes]:
+    """Read every staged file exactly once, never following a symlink.
+    `apply` validates and then writes these same bytes, so an edit made to
+    staging after this read can never reach live memory unvalidated.
+    """
+    payloads: dict[str, bytes] = {}
+    for rel in sorted(staged_files(staging)):
+        try:
+            fd = os.open(staging / rel, os.O_RDONLY | os.O_NOFOLLOW)
+        except OSError as exc:
+            raise RunError(f"cannot read staged file {rel}: {exc}") from exc
+        with os.fdopen(fd, "rb") as fh:
+            payloads[rel] = fh.read()
+    return payloads
+
+
+def _staged_path_exists(payloads: dict[str, bytes], rel: str) -> bool:
+    rel = rel.rstrip("/")
+    return rel in payloads or any(key.startswith(rel + "/") for key in payloads)
+
+
 def read_decisions(run_dir: Path) -> list[dict[str, Any]]:
     path = run_dir / "decisions.jsonl"
     if not path.exists():
@@ -981,29 +1033,105 @@ def write_commit_marker(run_dir: Path, run_id: str, status: str, backup: Path | 
     })
 
 
+def commit_state_path(ws: Workspace, run_id: str) -> Path:
+    return control_dir_for(ws, run_id) / "commit.json"
+
+
+def write_commit_state(ws: Workspace, run_dir: Path, run_id: str, status: str, backup: Path | None = None) -> None:
+    """Publish a commit transition: the trusted record first, then the
+    agent-visible ``run_dir/commit.json`` display copy. Recovery decides from
+    the trusted record, so an edited display copy can neither trigger nor
+    suppress a restore.
+    """
+    record = {
+        "run_id": run_id,
+        "status": status,
+        "backup": str(backup) if backup else None,
+        "updated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+    }
+    ensure_control_dir(control_dir_for(ws, run_id))
+    write_control_json(commit_state_path(ws, run_id), record)
+    atomic_json(commit_marker_path(run_dir), record)
+
+
+def load_commit_state(ws: Workspace, run_id: str) -> dict[str, Any] | None:
+    """Return the trusted commit record, or ``None`` if apply never reached
+    its first commit transition (so no live file was written)."""
+    path = commit_state_path(ws, run_id)
+    if path.is_symlink():
+        raise RunError(f"refusing to read symlinked trusted commit state: {path}")
+    if not path.exists():
+        return None
+    record = read_json(path)
+    if record is None or record.get("run_id") != run_id or record.get("status") not in VALID_MARKER_STATUSES:
+        raise RunError(f"trusted commit state is malformed for run {run_id!r}; refusing to guess about recovery")
+    return record
+
+
+def tracks_commit_state(control: dict[str, Any] | None) -> bool:
+    return bool(control) and control.get("commit_state_version") == COMMIT_STATE_VERSION
+
+
+def resolve_commit_status(ws: Workspace, run_dir: Path, run_id: str, control: dict[str, Any]) -> dict[str, Any] | None:
+    """The commit status recovery may act on. Runs prepared by this version
+    use the trusted record only; older runs have nothing but the display
+    marker, which is strictly validated.
+    """
+    if tracks_commit_state(control):
+        return load_commit_state(ws, run_id)
+    return read_valid_commit_marker(run_dir, run_id)
+
+
+def sync_display_marker(run_dir: Path, state: dict[str, Any]) -> None:
+    if run_dir.is_dir() and read_json(commit_marker_path(run_dir)) != state:
+        atomic_json(commit_marker_path(run_dir), state)
+
+
 def _run_dirs(ws: Workspace) -> list[Path]:
     if not ws.runs.is_dir():
         return []
     return [d for d in ws.runs.iterdir() if d.is_dir() and not d.is_symlink()]
 
 
+def _control_dirs(ws: Workspace) -> list[Path]:
+    root = ws.home / CONTROL_DIR_REL
+    if not root.is_dir():
+        return []
+    return [d for d in root.iterdir() if d.is_dir() and not d.is_symlink()]
+
+
+def run_has_unresolved_commit(ws: Workspace, run_id: str) -> bool:
+    control = read_json(control_dir_for(ws, run_id) / "control.json")
+    if tracks_commit_state(control):
+        path = commit_state_path(ws, run_id)
+        if not path.exists():
+            return False
+        record = read_json(path)
+        # An unreadable trusted record blocks new runs until an operator
+        # resolves it -- it must never be read as "nothing to recover".
+        return (
+            record is None or record.get("run_id") != run_id
+            or record.get("status") not in ("completed", "recovered")
+        )
+    marker = read_json(commit_marker_path(ws.runs / run_id))
+    return bool(marker) and marker.get("status") not in ("completed", "recovered")
+
+
 def find_incomplete_commits(ws: Workspace) -> list[str]:
-    incomplete: list[str] = []
-    for run_dir in _run_dirs(ws):
-        data = read_json(run_dir / "commit.json")
-        if data and data.get("status") == "in_progress":
-            incomplete.append(str(data.get("run_id") or run_dir.name))
-    return sorted(set(incomplete))
+    names = {d.name for d in _run_dirs(ws)} | {d.name for d in _control_dirs(ws)}
+    return sorted(name for name in names if RUN_ID_RE.fullmatch(name) and run_has_unresolved_commit(ws, name))
 
 
 def protected_backup_paths(ws: Workspace) -> set[str]:
     """Backups that `recover` still needs -- referenced by an in-progress commit
-    marker. `prune` must never delete the only backup an interrupted commit can
-    be recovered from, no matter how old it is or how many newer backups exist.
+    marker or trusted commit record. `prune` must never delete the only backup
+    an interrupted commit can be recovered from, no matter how old it is or how
+    many newer backups exist.
     """
     protected: set[str] = set()
-    for run_dir in _run_dirs(ws):
-        data = read_json(run_dir / "commit.json")
+    candidates = [d / "commit.json" for d in _run_dirs(ws)] + [d / "commit.json" for d in _control_dirs(ws)]
+    for path in candidates:
+        data = read_json(path)
         if data and data.get("status") == "in_progress" and data.get("backup"):
             protected.add(str(Path(data["backup"]).resolve()))
     return protected
@@ -1013,7 +1141,9 @@ def protected_backup_paths(ws: Workspace) -> set[str]:
 # Validation
 # --------------------------------------------------------------------------
 
-def validate_run(ws: Workspace, run_dir: Path) -> tuple[bool, list[str], list[str]]:
+def validate_run(
+    ws: Workspace, run_dir: Path, payloads: dict[str, bytes] | None = None,
+) -> tuple[bool, list[str], list[str]]:
     manifest = read_json(run_dir / "manifest.json")
     if not manifest:
         return False, ["manifest is missing or invalid"], []
@@ -1035,7 +1165,9 @@ def validate_run(ws: Workspace, run_dir: Path) -> tuple[bool, list[str], list[st
     baseline: dict[str, str] = manifest.get("baseline_hashes") or {}
     if snapshot(ws) != baseline:
         errors.append("live memory changed after prepare")
-    staged = staged_files(staging)
+    if payloads is None:
+        payloads = read_staged_payloads(staging)
+    staged = set(payloads)
     baseline_files = set(baseline)
     additions, deletions = staged - baseline_files, baseline_files - staged
     if deletions:
@@ -1043,7 +1175,7 @@ def validate_run(ws: Workspace, run_dir: Path) -> tuple[bool, list[str], list[st
     for rel in additions:
         if not rel.startswith("docs/") or not safe_relative_path(rel):
             errors.append(f"new file outside docs/: {rel}")
-    changed = sorted(rel for rel in staged if rel not in baseline or digest_file(staging / rel) != baseline[rel])
+    changed = sorted(rel for rel in staged if rel not in baseline or digest_bytes(payloads[rel]) != baseline[rel])
 
     decisions = read_decisions(run_dir)
     lower_bound = manifest.get("lower_bound")
@@ -1200,7 +1332,7 @@ def validate_run(ws: Workspace, run_dir: Path) -> tuple[bool, list[str], list[st
             if not any(ev.get("role") == "user" for ev in resolved_events):
                 errors.append("write disposition lacks a qualifying user-role evidence event")
 
-        if SECRET_RE.search(str(record.get("claim", ""))) or SECRET_RE.search(str(record.get("reason", ""))):
+        if contains_secret(str(record.get("claim", ""))) or contains_secret(str(record.get("reason", ""))):
             errors.append("secret-like value in decision metadata")
 
     if supporting_destinations and not has_primary_write:
@@ -1213,7 +1345,7 @@ def validate_run(ws: Workspace, run_dir: Path) -> tuple[bool, list[str], list[st
     for rel in sorted(changed_memory - authorized):
         errors.append(f"memory change not authorized by any decision destination: {rel}")
     for rel in changed:
-        if SECRET_RE.search((staging / rel).read_text(errors="replace")):
+        if contains_secret(payloads[rel].decode("utf-8", errors="replace")):
             errors.append(f"secret-like value in changed file: {rel}")
 
     if LEDGER_KEY in changed:
@@ -1223,18 +1355,17 @@ def validate_run(ws: Workspace, run_dir: Path) -> tuple[bool, list[str], list[st
         # replacement, or an in-place edit of an earlier entry -- is
         # rejected outright, no matter how plausible the new content looks.
         baseline_ledger_bytes = ws.ledger.read_bytes() if ws.ledger.exists() else b""
-        staged_ledger_bytes = (staging / LEDGER_KEY).read_bytes()
+        staged_ledger_bytes = payloads[LEDGER_KEY]
         if not staged_ledger_bytes.startswith(baseline_ledger_bytes):
             errors.append("staged extraction ledger must start with the exact baseline ledger bytes (append-only)")
 
-    map_path = staging / "AGENTS.md"
-    if map_path.exists():
-        map_text = map_path.read_text()
+    if "AGENTS.md" in payloads:
+        map_text = payloads["AGENTS.md"].decode("utf-8")
         if len(map_text.splitlines()) > 100:
             errors.append("AGENTS.md exceeds the 100-line limit")
         pointers = {match.rstrip(".,;:").lstrip("./") for match in POINTER_RE.findall(map_text)}
         for pointer in pointers:
-            if not (staging / pointer).exists():
+            if not _staged_path_exists(payloads, pointer):
                 errors.append(f"broken map pointer: {pointer}")
 
     # Complete discovered-session accounting: every session the runner
@@ -1279,12 +1410,14 @@ def validate_run(ws: Workspace, run_dir: Path) -> tuple[bool, list[str], list[st
 
     diff_parts: list[str] = []
     for rel in sorted(set(baseline) | staged):
-        old, new = ws.home / rel, staging / rel
+        old = ws.home / rel
         old_text = old.read_text(errors="replace") if old.exists() else ""
-        new_text = new.read_text(errors="replace") if new.exists() else ""
+        new_text = payloads[rel].decode("utf-8", errors="replace") if rel in payloads else ""
         if old_text != new_text:
             diff_parts.append("".join(difflib.unified_diff(old_text.splitlines(True), new_text.splitlines(True), fromfile=f"a/{rel}", tofile=f"b/{rel}")))
-    (run_dir / "diff.patch").write_text("\n".join(diff_parts))
+    # atomic_write replaces the directory entry, so a symlink planted at an
+    # output path is swapped out rather than written through.
+    atomic_write(run_dir / "diff.patch", "\n".join(diff_parts).encode())
 
     report = [
         "# ZCode extraction run report", "",
@@ -1294,7 +1427,7 @@ def validate_run(ws: Workspace, run_dir: Path) -> tuple[bool, list[str], list[st
         "## Dispositions", "",
     ]
     report.extend(f"- {item.get('disposition')}: {item.get('claim')} -> {item.get('destination') or 'n/a'}" for item in decisions)
-    (run_dir / "report.md").write_text("\n".join(report) + "\n")
+    atomic_write(run_dir / "report.md", ("\n".join(report) + "\n").encode())
 
     passed = not errors
     atomic_json(run_dir / "validation.json", {"passed": passed, "errors": errors, "changed_files": changed})
@@ -1633,8 +1766,12 @@ def cmd_apply(args: argparse.Namespace) -> int:
         raise RunError("refusing to apply without --apply")
     require_lock(ws, args.run_id)
     run_id = safe_run_id(args.run_id)
-    run_dir, manifest = load_manifest(ws, run_id)
-    staged = staged_files(run_dir / "staging")
+    run_dir, _ = load_manifest(ws, run_id)
+    # The window bound and live baseline come from trusted state, never from
+    # the agent-editable manifest (which validate_run only checks against it).
+    control = load_control_record(ws, run_id)
+    payloads = read_staged_payloads(run_dir / "staging")
+    staged = set(payloads)
 
     # Full symlink preflight over every path this apply might touch -- run
     # first, before even re-validation, so a hostile symlink swap (e.g. the
@@ -1642,60 +1779,69 @@ def cmd_apply(args: argparse.Namespace) -> int:
     # exactly that instead of being masked by a generic staleness error
     # further down, and so nothing is written before every destination is
     # confirmed safe.
-    preflight_rels = sorted(set(manifest.get("baseline_hashes", {})) | staged | {WATERMARK_REL})
+    preflight_rels = sorted(set(control.get("baseline_hashes") or {}) | staged | {WATERMARK_REL})
     preflight_write_targets(ws, preflight_rels)
 
     # A validation.json on disk only proves staging passed at some point in the
     # past -- staging, decisions.jsonl, or session_dispositions.jsonl could have
     # been edited since (by hand, or by a second `validate` call that then
     # failed). Trusting that stale file would let unreviewed changes through,
-    # so apply always recomputes validation against the current on-disk state
-    # immediately before writing anything live. This also re-checks the live
-    # baseline (and, via validate_run, the trusted control record), so those
-    # checks are intentionally not duplicated here.
-    passed, errors, _ = validate_run(ws, run_dir)
+    # so apply always recomputes validation immediately before writing
+    # anything live, over the exact in-memory bytes it will then write. This
+    # also re-checks the live baseline (and, via validate_run, the trusted
+    # control record), so those checks are intentionally not duplicated here.
+    passed, errors, _ = validate_run(ws, run_dir, payloads)
     if not passed:
         raise RunError("run does not pass validation: " + "; ".join(errors))
 
     # Backup-then-trust-then-commit, in that order, and only once each:
     # fully create the pre-run backup, bind it into runner-controlled trusted
-    # apply state, and only then publish the single durable commit marker --
+    # apply state, and only then publish the single durable commit record --
     # before any of this, no live target has been touched, so an
     # interruption anywhere up to and including this point needs no
     # recovery at all.
-    backup = backup_live(ws, manifest, staged)
+    backup = backup_live(ws, control, staged)
     write_control_apply_state(ws, run_id, staged, backup)
-    write_commit_marker(run_dir, run_id, "in_progress", backup=backup)
+    write_commit_state(ws, run_dir, run_id, "in_progress", backup=backup)
 
     # Deliberately not wrapped in try/except: an interruption here (including
-    # a hard kill) leaves the marker at "in_progress" and some staged files
+    # a hard kill) leaves the commit at "in_progress" and some staged files
     # possibly applied and some not -- recoverable via `recover`, not atomic.
     for rel in sorted(staged):
         target = live_target_path(ws, rel)
         validate_target_path(ws, target)
         target.parent.mkdir(parents=True, exist_ok=True)
-        atomic_write(target, (run_dir / "staging" / rel).read_bytes())
+        atomic_write(target, payloads[rel])
 
     # Watermark advances only after every staged memory file has been
     # written -- a failed run always re-processes the same sessions.
-    watermark = {"last_time_updated": manifest["upper_bound"]}
+    watermark = {"last_time_updated": control["upper_bound"]}
     atomic_json(ws.state, watermark)
 
-    write_commit_marker(run_dir, run_id, "completed", backup=backup)
+    write_commit_state(ws, run_dir, run_id, "completed", backup=backup)
     release_lock(ws, run_id)
     (run_dir / "normalized_sessions.jsonl").unlink(missing_ok=True)
     print(json.dumps({"applied": True, "backup": str(backup), "watermark": watermark}))
     return 0
 
 
-def _recover_in_progress(ws: Workspace, run_dir: Path, run_id: str, marker: dict[str, Any]) -> dict[str, Any]:
-    """Perform recovery for a run whose marker has already been confirmed
-    valid and ``in_progress``. Shared by `recover` (which additionally
-    enforces normal lock ownership) and `repair-recover` (which claims
-    ownership of a malformed/abandoned lock first) so the actual
-    verify-then-restore logic is not duplicated between them.
+def _recover_in_progress(
+    ws: Workspace, run_dir: Path, run_id: str, state: dict[str, Any], control: dict[str, Any],
+) -> dict[str, Any]:
+    """Perform recovery for a run whose commit status (see
+    ``resolve_commit_status``) has already been confirmed ``in_progress``.
+    Shared by `recover` (which additionally enforces normal lock ownership)
+    and `repair-recover` (which claims ownership of a malformed/abandoned
+    lock first) so the actual verify-then-restore logic is not duplicated
+    between them.
     """
-    marker_backup = marker.get("backup")
+    marker_backup = state.get("backup")
+    apply_state = load_control_apply_state(ws, run_id)
+    if marker_backup and apply_state is not None and apply_state.get("backup_path") != marker_backup:
+        raise RunError(
+            f"commit record names backup {marker_backup!r} but the trusted apply state bound "
+            f"{apply_state.get('backup_path')!r}; refusing to restore"
+        )
 
     if not marker_backup:
         # The marker was published *before* backup_live() made the backup
@@ -1705,13 +1851,13 @@ def _recover_in_progress(ws: Workspace, run_dir: Path, run_id: str, marker: dict
         # live memory *and* the watermark must still exactly match this
         # run's own recorded baseline. A missing watermark is not the only
         # safe baseline -- a run prepared against an already-existing,
-        # unchanged watermark must abort just as safely. If either baseline
-        # is missing from the manifest (a run prepared by an older version
-        # of this script) or either has diverged, we must fail closed rather
-        # than guess.
-        run_manifest = read_json(run_dir / "manifest.json") or {}
-        baseline = run_manifest.get("baseline_hashes") or {}
-        watermark_baseline = run_manifest.get("watermark_baseline")
+        # unchanged watermark must abort just as safely. Both baselines come
+        # from the trusted control record, not the editable manifest. If
+        # either is missing (a run prepared by an older version of this
+        # script) or either has diverged, we must fail closed rather than
+        # guess.
+        baseline = control.get("baseline_hashes") or {}
+        watermark_baseline = control.get("watermark_baseline")
         if not isinstance(watermark_baseline, dict) or "existed" not in watermark_baseline:
             raise RunError(
                 "manifest predates watermark-baseline tracking (prepared by an older runner version); "
@@ -1726,7 +1872,7 @@ def _recover_in_progress(ws: Workspace, run_dir: Path, run_id: str, marker: dict
             current_watermark_existed == watermark_existed and current_watermark_hash == watermark_hash
         )
         if snapshot(ws) == baseline and watermark_matches:
-            write_commit_marker(run_dir, run_id, "recovered", backup=None)
+            write_commit_state(ws, run_dir, run_id, "recovered", backup=None)
             (run_dir / "normalized_sessions.jsonl").unlink(missing_ok=True)
             release_lock(ws, run_id)
             return {"recovered": True, "backup": None, "reason": "aborted before any live write"}
@@ -1742,7 +1888,7 @@ def _recover_in_progress(ws: Workspace, run_dir: Path, run_id: str, marker: dict
     resolved_backup, verified = verify_backup_for_restore(ws, run_id, Path(marker_backup))
     apply_verified_restore(ws, verified)
 
-    write_commit_marker(run_dir, run_id, "recovered", backup=resolved_backup)
+    write_commit_state(ws, run_dir, run_id, "recovered", backup=resolved_backup)
     (run_dir / "normalized_sessions.jsonl").unlink(missing_ok=True)
     release_lock(ws, run_id)
     return {"recovered": True, "backup": str(resolved_backup)}
@@ -1771,32 +1917,36 @@ def cmd_recover(args: argparse.Namespace) -> int:
         raise RunError(f"recovery refused: extraction lock is owned by a different run ({lock_meta.get('run_id')})")
     same_run_lock = lock_state == "valid" and lock_meta.get("run_id") == run_id
 
-    # No filename-based fallback anywhere below: recovery only ever acts on
-    # a run whose marker is present, well-formed, and names this exact run.
-    marker = read_valid_commit_marker(run_dir, run_id)
-
     # The editable manifest/backup manifest are never trusted for a run with
     # no trusted control state at all -- refuse outright rather than guess.
-    load_control_record(ws, run_id)
+    control = load_control_record(ws, run_id)
 
-    status = marker["status"]
-    if status == "completed":
+    # No filename-based fallback anywhere below: recovery only ever acts on
+    # the trusted commit record (or, for a run prepared before that record
+    # existed, a present, well-formed marker naming this exact run).
+    state = resolve_commit_status(ws, run_dir, run_id, control)
+    if state is None:
+        raise RunError(
+            f"run {run_id!r} never started a commit (no trusted commit record), so no live file was "
+            "written; nothing to recover -- use `unlock-abandoned` if its lock is stale"
+        )
+
+    status = state["status"]
+    if status in ("completed", "recovered"):
         # Nothing to roll back -- restoring here would silently clobber any
-        # later run's work. Only a leftover same-run lock is cleaned up.
+        # later run's work, and recovering an already-recovered run must
+        # never restore a second time. A display marker that disagrees with
+        # the trusted record is rewritten, and a leftover same-run lock is
+        # cleaned up.
+        if tracks_commit_state(control):
+            sync_display_marker(run_dir, state)
         if same_run_lock:
             release_lock(ws, run_id)
-        print(json.dumps({"recovered": False, "backup": marker.get("backup"), "reason": "already completed"}))
+        reason = "already completed" if status == "completed" else "already recovered"
+        print(json.dumps({"recovered": False, "backup": state.get("backup"), "reason": reason}))
         return 0
 
-    if status == "recovered":
-        # Idempotent: recovering an already-recovered run must never
-        # restore a second time (a later run could have started since).
-        if same_run_lock:
-            release_lock(ws, run_id)
-        print(json.dumps({"recovered": False, "backup": marker.get("backup"), "reason": "already recovered"}))
-        return 0
-
-    result = _recover_in_progress(ws, run_dir, run_id, marker)
+    result = _recover_in_progress(ws, run_dir, run_id, state, control)
     print(json.dumps(result))
     return 0
 
@@ -1820,10 +1970,11 @@ def cmd_repair_recover(args: argparse.Namespace) -> int:
             "that no extraction process for this run is still alive"
         )
     run_dir = resolve_run_dir(ws, run_id)
-    load_control_record(ws, run_id)
-    marker = read_valid_commit_marker(run_dir, run_id)
-    if marker["status"] != "in_progress":
-        raise RunError(f"run {run_id!r} has no incomplete commit to repair (status={marker['status']!r})")
+    control = load_control_record(ws, run_id)
+    state = resolve_commit_status(ws, run_dir, run_id, control)
+    if state is None or state["status"] != "in_progress":
+        found = state["status"] if state else "not started"
+        raise RunError(f"run {run_id!r} has no incomplete commit to repair (status={found!r})")
 
     lock_state, lock_meta = inspect_lock(ws)
     if lock_state == "valid":
@@ -1844,7 +1995,7 @@ def cmd_repair_recover(args: argparse.Namespace) -> int:
         shutil.rmtree(ws.lock, ignore_errors=True)
     acquire_lock(ws, run_id)
 
-    result = _recover_in_progress(ws, run_dir, run_id, marker)
+    result = _recover_in_progress(ws, run_dir, run_id, state, control)
     print(json.dumps(result))
     return 0
 

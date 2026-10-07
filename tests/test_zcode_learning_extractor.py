@@ -586,18 +586,15 @@ class ZcodeExtractorTests(unittest.TestCase):
         self.assertEqual(rc, 0)
 
         original_atomic_write = ext.atomic_write
-        calls = {"n": 0}
+        live_index = self.ws.memory / "index.md"
 
         def flaky_atomic_write(path, data):
-            calls["n"] += 1
-            # Sequence inside cmd_apply: (1) its internal re-validation writes
-            # validation.json, (2) backup's presence.json, (3) trusted
-            # apply.json, (4) commit marker (with backup), then the staged
-            # files in sorted order: (5) AGENTS.extraction-log.md, (6)
-            # docs/index.md, (7) docs/rules.md. Failing on the 6th call means
-            # one staged live file (the ledger) has already been applied when
-            # the crash hits -- proving the design is recoverable, not atomic.
-            if calls["n"] == 6:
+            # Staged files are applied in sorted order (ledger, then
+            # docs/index.md, then docs/rules.md). Failing on the live index
+            # means one staged live file (the ledger) has already been
+            # applied when the crash hits -- proving the design is
+            # recoverable, not atomic.
+            if Path(path).resolve() == live_index.resolve():
                 raise OSError("simulated crash mid-apply")
             return original_atomic_write(path, data)
 
@@ -646,16 +643,12 @@ class ZcodeExtractorTests(unittest.TestCase):
         self._stage_valid_change(run_dir, "s1")
         run_cmd(ext.cmd_validate, self.base_args(command="validate", run_id=result["run_id"]))
         original_atomic_write = ext.atomic_write
-        calls = {"n": 0}
 
         def flaky(path, data):
-            calls["n"] += 1
-            # Let the internal re-validation, the trusted apply-state write,
-            # both commit-marker writes, and the backup succeed first; fail
-            # right as the staged-file loop starts (see the call sequence
-            # documented in
-            # test_interrupted_commit_is_detected_and_recoverable).
-            if calls["n"] >= 5:
+            # Let re-validation, the backup, the trusted apply state, and the
+            # in-progress commit record succeed; fail on the first live
+            # write (the ledger sorts first among the staged files).
+            if Path(path).resolve() == self.ws.ledger.resolve():
                 raise OSError("boom")
             return original_atomic_write(path, data)
 
@@ -707,7 +700,7 @@ class ZcodeExtractorTests(unittest.TestCase):
             # is referenced by the marker + trusted apply state, but the run
             # is unambiguously "incomplete".
             name = Path(path).name
-            if name in {"commit.json", "presence.json", "validation.json", "apply.json"}:
+            if name in {"commit.json", "presence.json", "validation.json", "apply.json", "diff.patch", "report.md"}:
                 return original_atomic_write(path, data)
             raise OSError("boom")
 
@@ -839,27 +832,25 @@ class ZcodeExtractorTests(unittest.TestCase):
         return state
 
     def _interrupt_before_backup(self, run_dir: Path, run_id: str) -> None:
-        """Simulate a crash between the *first* commit-marker write and
-        backup_live() -- the marker is in_progress with no backup recorded,
-        no trusted apply state exists, and by construction no live file has
-        been touched yet.
+        """Simulate an in-progress commit recorded with no backup (the write
+        order of older runners) -- no trusted apply state exists, and by
+        construction no live file has been touched yet.
         """
         self._ensure_control_record(run_dir, run_id)
-        ext.write_commit_marker(run_dir, run_id, "in_progress")
+        ext.write_commit_state(self.ws, run_dir, run_id, "in_progress")
 
     def _interrupt_after_backup(self, run_dir: Path, run_id: str) -> Path:
         """Simulate a crash right after the backup is produced, fully
         verified, and recorded in trusted control state, but before any
-        staged file is written live -- marker in_progress with a backup and
+        staged file is written live -- commit in_progress with a backup and
         a matching trusted apply state.
         """
         manifest = json.loads((run_dir / "manifest.json").read_text())
         staged = ext.staged_files(run_dir / "staging")
         self._ensure_control_record(run_dir, run_id)
-        ext.write_commit_marker(run_dir, run_id, "in_progress")
         backup = ext.backup_live(self.ws, manifest, staged)
-        ext.write_commit_marker(run_dir, run_id, "in_progress", backup=backup)
         self._write_apply_state(run_dir, run_id, backup)
+        ext.write_commit_state(self.ws, run_dir, run_id, "in_progress", backup=backup)
         return backup
 
     def _prepare_with_user_and_tool_events(self):
@@ -1377,10 +1368,10 @@ class ZcodeExtractorTests(unittest.TestCase):
         backup = self._interrupt_after_backup(run_dir, result["run_id"])
         evil = self.root / "evil-backup"
         shutil.copytree(backup, evil)
-        marker_path = run_dir / "commit.json"
-        marker = json.loads(marker_path.read_text())
-        marker["backup"] = str(evil)
-        marker_path.write_text(json.dumps(marker))
+        record_path = self._control_dir(result["run_id"]) / "commit.json"
+        record = json.loads(record_path.read_text())
+        record["backup"] = str(evil)
+        record_path.write_text(json.dumps(record))
 
         with self.assertRaises(ext.RunError):
             ext.cmd_recover(self.base_args(command="recover", run_id=result["run_id"]))
@@ -1394,13 +1385,35 @@ class ZcodeExtractorTests(unittest.TestCase):
         fake_manifest = {"run_id": "run-b", "baseline_hashes": {}}
         backup_b = ext.backup_live(self.ws, fake_manifest, set())
 
-        marker_path = run_dir_a / "commit.json"
-        marker = json.loads(marker_path.read_text())
-        marker["backup"] = str(backup_b)
-        marker_path.write_text(json.dumps(marker))
+        record_path = self._control_dir("run-a") / "commit.json"
+        record = json.loads(record_path.read_text())
+        record["backup"] = str(backup_b)
+        record_path.write_text(json.dumps(record))
 
         with self.assertRaises(ext.RunError):
             ext.cmd_recover(self.base_args(command="recover", run_id="run-a"))
+
+    def test_recover_ignores_backup_path_forged_in_display_marker(self) -> None:
+        add_session(self.session_con, "s1", str(self.personal), time_updated=ext.now_ms())
+        add_text_turn(self.session_con, "s1", 0, "user", "Always run tests before committing.", ext.now_ms())
+        result = self.prepare()
+        run_dir = Path(result["run_dir"])
+        self._stage_valid_change(run_dir, "s1")
+        backup = self._interrupt_after_backup(run_dir, result["run_id"])
+        (self.ws.memory / "rules.md").write_text("partially applied")
+        decoy = self.ws.home / f"extraction-backup-20990101T000000-{result['run_id']}"
+        shutil.copytree(backup, decoy)
+        (decoy / "docs" / "rules.md").write_text("DECOY RESTORE")
+        marker_path = run_dir / "commit.json"
+        marker = json.loads(marker_path.read_text())
+        marker["backup"] = str(decoy)
+        marker_path.write_text(json.dumps(marker))
+
+        rc, out = run_cmd(ext.cmd_recover, self.base_args(command="recover", run_id=result["run_id"]))
+        self.assertEqual(rc, 0)
+        self.assertTrue(out["recovered"])
+        self.assertEqual(Path(out["backup"]), backup.resolve())
+        self.assertEqual((self.ws.memory / "rules.md").read_text(), "# Rules\n")
 
     def test_recover_rejects_inventory_traversal_key(self) -> None:
         result = self.prepare()
@@ -1969,7 +1982,7 @@ class ZcodeExtractorTests(unittest.TestCase):
     # Astra round 2, finding 3: commit marker strictness.
     # ==================================================================
 
-    def test_recover_fails_closed_when_completed_marker_missing_or_corrupt(self) -> None:
+    def _commit_then_simulate_later_work(self) -> tuple[dict, Path, str]:
         add_session(self.session_con, "s1", str(self.personal), time_updated=ext.now_ms())
         add_text_turn(self.session_con, "s1", 0, "user", "Always run tests before committing.", ext.now_ms())
         result = self.prepare()
@@ -1979,41 +1992,67 @@ class ZcodeExtractorTests(unittest.TestCase):
         self.assertEqual(rc, 0)
         later_work = "# Rules\n- Written by a later run.\n"
         (self.ws.memory / "rules.md").write_text(later_work)
-        marker_path = run_dir / "commit.json"
+        return result, run_dir, later_work
 
-        marker_path.unlink()
-        with self.assertRaises(ext.RunError):
-            ext.cmd_recover(self.base_args(command="recover", run_id=result["run_id"]))
-        self.assertEqual((self.ws.memory / "rules.md").read_text(), later_work,
-                         "a missing marker must never trigger a backup-based rollback")
-
-        marker_path.write_text("{not valid json")
-        with self.assertRaises(ext.RunError):
-            ext.cmd_recover(self.base_args(command="recover", run_id=result["run_id"]))
-        self.assertEqual((self.ws.memory / "rules.md").read_text(), later_work)
-
-    def test_recover_fails_closed_on_unknown_status_and_run_id_mismatch(self) -> None:
-        add_session(self.session_con, "s1", str(self.personal), time_updated=ext.now_ms())
-        add_text_turn(self.session_con, "s1", 0, "user", "Always run tests before committing.", ext.now_ms())
-        result = self.prepare()
-        run_dir = Path(result["run_dir"])
-        self._stage_valid_change(run_dir, "s1")
-        rc, _ = run_cmd(ext.cmd_commit, self.base_args(command="commit", run_id=result["run_id"]))
-        self.assertEqual(rc, 0)
-        later_work = "# Rules\n- Written by a later run.\n"
-        (self.ws.memory / "rules.md").write_text(later_work)
+    def test_tampered_display_marker_never_triggers_restore_of_completed_run(self) -> None:
+        result, run_dir, later_work = self._commit_then_simulate_later_work()
         marker_path = run_dir / "commit.json"
         original = json.loads(marker_path.read_text())
 
-        marker_path.write_text(json.dumps({**original, "status": "half_done"}))
-        with self.assertRaises(ext.RunError):
-            ext.cmd_recover(self.base_args(command="recover", run_id=result["run_id"]))
-        self.assertEqual((self.ws.memory / "rules.md").read_text(), later_work)
+        tamperings = [
+            None,  # deleted
+            "{not valid json",
+            json.dumps({**original, "status": "half_done"}),
+            json.dumps({**original, "run_id": "not-this-run"}),
+            json.dumps({**original, "status": "in_progress"}),
+        ]
+        for tampered in tamperings:
+            if tampered is None:
+                marker_path.unlink()
+            else:
+                marker_path.write_text(tampered)
+            self.assertEqual(ext.find_incomplete_commits(self.ws), [], tampered)
+            rc, out = run_cmd(ext.cmd_recover, self.base_args(command="recover", run_id=result["run_id"]))
+            self.assertEqual(rc, 0)
+            self.assertFalse(out["recovered"])
+            self.assertEqual(out["reason"], "already completed")
+            self.assertEqual((self.ws.memory / "rules.md").read_text(), later_work,
+                             "an edited display marker must never trigger a backup-based rollback")
+            self.assertEqual(json.loads(marker_path.read_text())["status"], "completed",
+                             "the display marker is rewritten from the trusted record")
 
-        marker_path.write_text(json.dumps({**original, "run_id": "not-this-run"}))
-        with self.assertRaises(ext.RunError):
-            ext.cmd_recover(self.base_args(command="recover", run_id=result["run_id"]))
-        self.assertEqual((self.ws.memory / "rules.md").read_text(), later_work)
+    def test_recover_fails_closed_when_trusted_commit_record_is_corrupt(self) -> None:
+        result, run_dir, later_work = self._commit_then_simulate_later_work()
+        record_path = self._control_dir(result["run_id"]) / "commit.json"
+        original = json.loads(record_path.read_text())
+
+        for tampered in ("{not valid json", json.dumps({**original, "status": "half_done"}),
+                         json.dumps({**original, "run_id": "not-this-run"})):
+            record_path.write_text(tampered)
+            self.assertIn(result["run_id"], ext.find_incomplete_commits(self.ws))
+            with self.assertRaises(ext.RunError):
+                ext.cmd_recover(self.base_args(command="recover", run_id=result["run_id"]))
+            self.assertEqual((self.ws.memory / "rules.md").read_text(), later_work)
+
+    def test_legacy_run_without_trusted_commit_record_still_validates_its_marker(self) -> None:
+        result, run_dir, later_work = self._commit_then_simulate_later_work()
+        control_path = self._control_dir(result["run_id"]) / "control.json"
+        control = json.loads(control_path.read_text())
+        control.pop("commit_state_version")
+        control_path.write_text(json.dumps(control))
+        (self._control_dir(result["run_id"]) / "commit.json").unlink()
+        marker_path = run_dir / "commit.json"
+        original = json.loads(marker_path.read_text())
+
+        for tampered in (None, "{not valid json", json.dumps({**original, "status": "half_done"}),
+                         json.dumps({**original, "run_id": "not-this-run"})):
+            if tampered is None:
+                marker_path.unlink(missing_ok=True)
+            else:
+                marker_path.write_text(tampered)
+            with self.assertRaises(ext.RunError):
+                ext.cmd_recover(self.base_args(command="recover", run_id=result["run_id"]))
+            self.assertEqual((self.ws.memory / "rules.md").read_text(), later_work)
 
     def test_recover_never_searches_backups_by_filename_when_marker_missing(self) -> None:
         add_session(self.session_con, "s1", str(self.personal), time_updated=ext.now_ms())
@@ -2039,8 +2078,9 @@ class ZcodeExtractorTests(unittest.TestCase):
         }) + "\n")
         (decoy / "docs" / "rules.md").write_text("DECOY RESTORE")
 
-        with self.assertRaises(ext.RunError):
-            ext.cmd_recover(self.base_args(command="recover", run_id=result["run_id"]))
+        rc2, out2 = run_cmd(ext.cmd_recover, self.base_args(command="recover", run_id=result["run_id"]))
+        self.assertEqual(rc2, 0)
+        self.assertFalse(out2["recovered"])
         self.assertEqual((self.ws.memory / "rules.md").read_text(), later_work)
 
     # ==================================================================
@@ -2325,6 +2365,101 @@ class ZcodeExtractorTests(unittest.TestCase):
         marker = json.loads((run_dir / "commit.json").read_text())
         self.assertEqual(marker["status"], "in_progress")
         self.assertTrue(self.ws.lock.exists())
+
+    # ==================================================================
+    # Critic review (2026-09-25): secret coverage, validated-bytes binding,
+    # and symlink-safe validation outputs.
+    # ==================================================================
+
+    def test_redaction_covers_structured_keys_headers_and_token_formats(self) -> None:
+        samples = {
+            '"api_key": "abcdef123456"': "abcdef123456",
+            "{'password': 'hunter2hunter2'}": "hunter2hunter2",
+            "Authorization: Bearer abcdefghijklmnop": "abcdefghijklmnop",
+            "curl -H 'Authorization: Basic dXNlcjpwYXNzd29yZA=='": "dXNlcjpwYXNzd29yZA==",
+            "use bearer eyJhbGciOiJIUzI1NiJ9.e30.abc123 here": "eyJhbGciOiJIUzI1NiJ9.e30.abc123",
+            "export OPENAI_API_KEY=sk-proj-abcdefghijklmnopqrstuv": "sk-proj-abcdefghijklmnopqrstuv",
+            "token ghp_abcdefghijklmnopqrstuvwxyz0123456789": "ghp_abcdefghijklmnopqrstuvwxyz0123456789",
+            "aws AKIAABCDEFGHIJKLMNOP key": "AKIAABCDEFGHIJKLMNOP",
+            "-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXk\n-----END OPENSSH PRIVATE KEY-----": "b3BlbnNzaC1rZXk",
+        }
+        for text, secret in samples.items():
+            self.assertTrue(ext.contains_secret(text), text)
+            self.assertNotIn(secret, ext.redact(text), text)
+            self.assertIn("REDACTED", ext.redact(text), text)
+        for prose in ("Use Bearer authentication for the API.", "Set max_tokens: 4096.",
+                      "The risk-assessment-framework-document is long.", "basic understanding of tokens"):
+            self.assertFalse(ext.contains_secret(prose), prose)
+            self.assertEqual(ext.redact(prose), prose)
+
+    def test_session_titles_are_redacted_in_evidence_and_manifest(self) -> None:
+        now = ext.now_ms()
+        add_session(self.session_con, "s1", str(self.personal), time_updated=now,
+                    title="debug OPENAI_API_KEY=sk-proj-abcdefghijklmnopqrstuv")
+        add_text_turn(self.session_con, "s1", 0, "user", "Always run tests before committing.", now)
+        result = self.prepare()
+        run_dir = Path(result["run_dir"])
+        self.assertNotIn("sk-proj-abcdefghijklmnopqrstuv", (run_dir / "normalized_sessions.jsonl").read_text())
+        self.assertNotIn("sk-proj-abcdefghijklmnopqrstuv", (run_dir / "manifest.json").read_text())
+
+    def test_validate_rejects_json_style_secret_in_staged_memory(self) -> None:
+        now = ext.now_ms()
+        add_session(self.session_con, "s1", str(self.personal), time_updated=now)
+        add_text_turn(self.session_con, "s1", 0, "user", "Always run tests before committing.", now)
+        result = self.prepare()
+        run_dir = Path(result["run_dir"])
+        self._stage_valid_change(run_dir, "s1")
+        rules = run_dir / "staging" / "docs" / "rules.md"
+        rules.write_text(rules.read_text() + '- config: {"api_key": "abcdef123456"}\n')
+        rc, out = run_cmd(ext.cmd_validate, self.base_args(command="validate", run_id=result["run_id"]))
+        self.assertEqual(rc, 1)
+        self.assertIn("secret-like value in changed file: docs/rules.md", out["errors"])
+
+    def test_apply_writes_only_the_bytes_it_validated(self) -> None:
+        now = ext.now_ms()
+        add_session(self.session_con, "s1", str(self.personal), time_updated=now)
+        add_text_turn(self.session_con, "s1", 0, "user", "Always run tests before committing.", now)
+        result = self.prepare()
+        run_dir = Path(result["run_dir"])
+        self._stage_valid_change(run_dir, "s1")
+        validated_rules = (run_dir / "staging" / "docs" / "rules.md").read_text()
+        control = json.loads((self._control_dir(result["run_id"]) / "control.json").read_text())
+        real_validate = ext.validate_run
+
+        def validate_then_tamper(ws, rd, payloads=None):
+            outcome = real_validate(ws, rd, payloads)
+            # The agent edits staging and the manifest after validation has
+            # read them but before the first live write.
+            (rd / "staging" / "docs" / "rules.md").write_text('unvalidated {"api_key": "abcdef123456"}\n')
+            manifest_path = rd / "manifest.json"
+            manifest = json.loads(manifest_path.read_text())
+            manifest["upper_bound"] = manifest["upper_bound"] + 10**9
+            manifest_path.write_text(json.dumps(manifest))
+            return outcome
+
+        with mock.patch.object(ext, "validate_run", validate_then_tamper):
+            rc, _ = run_cmd(ext.cmd_apply, self.base_args(command="apply", run_id=result["run_id"], apply=True))
+        self.assertEqual(rc, 0)
+        self.assertEqual((self.ws.memory / "rules.md").read_text(), validated_rules)
+        self.assertEqual(json.loads(self.ws.state.read_text()), {"last_time_updated": control["upper_bound"]})
+
+    def test_validate_replaces_symlinked_outputs_instead_of_writing_through(self) -> None:
+        add_session(self.session_con, "s1", str(self.personal), time_updated=ext.now_ms())
+        result = self.prepare()
+        run_dir = Path(result["run_dir"])
+        live_map = self.ws.home / "AGENTS.md"
+        outside = self.root / "outside.txt"
+        outside.write_text("outside\n")
+        before_map = live_map.read_bytes()
+        (run_dir / "diff.patch").symlink_to(live_map)
+        (run_dir / "report.md").symlink_to(outside)
+
+        run_cmd(ext.cmd_validate, self.base_args(command="validate", run_id=result["run_id"]))
+        self.assertEqual(live_map.read_bytes(), before_map)
+        self.assertEqual(outside.read_text(), "outside\n")
+        for name in ("diff.patch", "report.md"):
+            self.assertFalse((run_dir / name).is_symlink(), name)
+            self.assertTrue((run_dir / name).is_file(), name)
 
     # ==================================================================
     # Astra round 2, finding 8: deployment checking against scheduler drift.
