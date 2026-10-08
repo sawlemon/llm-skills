@@ -4,8 +4,7 @@ dist/
 *.local
 .DS_Store
 
-# cherry-hillclimb: never commit the Cherry Studio API key
-.cherry-hillclimb.env
+# python bytecode (hindsight-bench, hill-climb scripts)
 __pycache__/
 *.pyc
 

@@ -1,7 +1,8 @@
 node_modules/
 package-lock.json
+.zcode/
 
-# Cherry Studio prompt/report artifacts are hand-authored or machine-generated data.
-prompts/
-reports/
+# hand-authored prose and recorded benchmark data
 skills/
+tools/hindsight-bench/prompts/
+tools/hindsight-bench/reports/
