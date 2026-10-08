@@ -67,6 +67,31 @@ class CliTests(unittest.TestCase):
             self.assertEqual(code, 0)
             self.assertEqual(json.loads(out)["total"], 3)
 
+    def test_repeatable_model_flag_expands_to_tuple(self):
+        args = type("Args", (), {})()
+        args.mode = "offline"
+        args.suite = ["rerank-neutral"]
+        args.model = ["cohere/rerank-4-pro", "voyageai/rerank-3"]
+        args.hindsight_url = None
+        args.bank = None
+        args.runs = 3
+        args.candidate_caps = None
+        args.context_limit = None
+        args.out_dir = None
+        args.include_text = False
+        args.allow_network = False
+        args.allow_persistence = False
+        args.dry_run = False
+        args.yes = False
+        args.json = False
+        args.seed = 1
+        args.hindsight_dry_run = False
+        args.max_journal_chars = 1000
+        args.concurrency = None
+        args.timeout = None
+        config = from_args(args)
+        self.assertEqual(config.models, ("cohere/rerank-4-pro", "voyageai/rerank-3"))
+
     def test_unknown_suite_rejected(self):
         with self.assertRaises(SystemExit):
             run_cli(["run", "--mode", "offline", "--suite", "nope"])

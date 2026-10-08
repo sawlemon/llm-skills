@@ -68,7 +68,8 @@ def from_args(args) -> BenchConfig:
     hindsight_bank = getattr(args, "bank", None) or _env("BANK", "")
     models = getattr(args, "models", None) or ()
     if getattr(args, "model", None):
-        models = (args.model,)
+        # --model is action="append", so args.model is a list of slugs
+        models = tuple(args.model)
     if not models:
         env_models = _env("MODEL")
         models = tuple(m for m in env_models.split(",") if m.strip()) if env_models else ()
