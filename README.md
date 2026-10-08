@@ -1,8 +1,7 @@
 # llm-skills
 
 Reusable LLM skills (`skills/`) — system-prompt definitions injected into LLM tools and apps
-(Claude Code, Claude Desktop, Cherry Studio, …) — plus the Cherry Studio prompt hill-climbing harness
-that maintains some of them.
+(Claude Code, Claude Desktop, …) — plus tooling that maintains some of them.
 
 > The LLM Report Card previously lived here; it now has its own repository at
 > [sawlemon/llm-reportcard](https://github.com/sawlemon/llm-reportcard), published to
@@ -20,12 +19,7 @@ skills/
   i-have-adhd/SKILL.md
   research/SKILL.md
 tools/
-  cherry-hillclimb/         daily prompt hill-climbing harness for a Cherry Studio assistant (see below)
   hindsight-bench/          reproducible Hindsight retain/recall/reranker benchmark suite (see below)
-prompts/
-  cherry-studio/<slug>/     current.md, candidate.md, history/, CHANGELOG.md per assistant (cherry-hillclimb output)
-reports/
-  cherry-hillclimb/         one dated report per propose run (learnings kept/rejected, diff)
 ```
 
 ## Skills
@@ -42,10 +36,6 @@ Point a tool's system prompt at a `skills/*/SKILL.md` file to apply that behavio
     `session_meta` line and writing to the same `~/.codex/AGENTS.md` map + `~/.codex/docs/` tree.
     The transactional runner in `skills/hill-climb/scripts/codex_learning_extractor.py` handles session
     discovery, checkpointing, staging, validation, backups, apply, and recovery.
-  - `cherry-studio-personal-prompt-hillclimb.md` — a different kind of persona: not a coding-agent
-    instruction file but the exact system prompt sent to an LLM by `tools/cherry-hillclimb/analyze.mjs`
-    (see "Cherry Studio prompt hill-climbing" below). Analyzes one Cherry Studio assistant's own recent
-    chat history and proposes a justified edit to its own system prompt.
   - `zcode-learning-extraction.md` — the ZCode variant: audits **ZCode** session transcripts stored in a
     local SQLite database (`~/.zcode/cli/db/db.sqlite`) and merges durable, gated, evidenced learnings
     into `~/.zcode/AGENTS.md` (capped at 100 lines) plus `~/.zcode/docs/`. Runs every 2 days via a ZCode
@@ -65,40 +55,6 @@ Point a tool's system prompt at a `skills/*/SKILL.md` file to apply that behavio
   critical decisions while delegating token-heavy exploration and consolidation to Luna, and code or
   reasoning-heavy execution to Sonnet. It requires complete task contracts, parallelizes independent work,
   and keeps final review and responsibility with the main model.
-
-## Cherry Studio prompt hill-climbing
-
-`tools/cherry-hillclimb/` is a self-contained Node harness that improves a Cherry Studio assistant's
-system prompt over time by mining its own recent chat history for durable, evidenced learnings — a small
-daily "hill-climb" loop, not an automatic rewrite. See
-[`tools/cherry-hillclimb/README.md`](tools/cherry-hillclimb/README.md) for exact run instructions,
-environment variables, troubleshooting, and the operational decisions (model choice, debug-port launch
-method, assistant-resolution gotchas) made while building and live-testing it.
-
-Each day, `propose` (1) reads the assistant's live system prompt and the last 24h of its conversations
-straight out of the running app over the Chrome DevTools Protocol, (2) sends both to an analyzer persona
-(`skills/hill-climb/cherry-studio-personal-prompt-hillclimb.md`) via Cherry Studio's own local API server,
-which returns gated, evidenced learnings and — only when confirmed learnings justify it — a candidate
-prompt, and (3) writes `current.md`, `candidate.md`, and a dated report under `prompts/cherry-studio/…`
-and `reports/cherry-hillclimb/` for you to review. Nothing is written back to the app until you run
-`apply`, and `apply` refuses to run if the live prompt has drifted since the proposal (e.g. you edited it
-in the UI meanwhile) or if verification after the dispatch doesn't match, rolling back in that case.
-
-```bash
-export CHERRY_API_KEY=cs-sk-…      # Cherry Studio → Settings → API Server, or ~/.cherry-hillclimb.env
-npm run cherry:debug               # relaunch Cherry Studio with a loopback-only CDP debug port
-npm run cherry:propose             # extract + analyze; writes candidate.md + a report, applies nothing
-npm run cherry:diff                # print the current.md → candidate.md diff
-npm run cherry:apply               # push the reviewed candidate.md into the live assistant
-```
-
-All four `cherry:*` scripts default to the assistant named `Personal`; pass `-- --assistant "Name"` to
-target another one. `propose` also takes `-- --hours 24` (lookback window) and `-- --model <id>` (defaults
-to a verified-compliant model, currently `gpt-5.6-terra` — see `tools/cherry-hillclimb/README.md` for why
-this isn't simply the first model Cherry Studio's API server reports). The evidence gate is enforced
-twice — once by the analyzer persona's instructions, once programmatically in `analyze.mjs`, which drops
-any "confirmed" learning whose quoted evidence cannot be found verbatim in the extracted transcript before
-it's allowed to justify a prompt edit.
 
 ## Hindsight benchmark suite
 
@@ -130,4 +86,4 @@ npm run format    # prettier --write .   (npm run format:check to verify only)
 
 `npm install` / `npm ci` enables the repository's `.githooks/pre-commit` hook. It formats staged
 Prettier-supported files and re-stages them before the commit is created; `.prettierignore` protects
-hand-authored prose in `prompts/`, `reports/`, and `skills/`.
+hand-authored prose in `skills/`.
