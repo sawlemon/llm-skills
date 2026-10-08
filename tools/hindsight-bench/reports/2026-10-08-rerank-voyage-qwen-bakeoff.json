@@ -73,5 +73,20 @@
       "unproven_causality": 0.990505,
       "current_reranker": 0.994183
     }
+  },
+  "nvidia/llama-nemotron-rerank-vl-1b-v2:free": {
+    "mean_ndcg10": 0.9691,
+    "median_latency_s": 1.8857,
+    "mean_cost_usd_per_300doc_call": 0.0,
+    "ok_calls": 18,
+    "error_calls": 0,
+    "per_case_ndcg10": {
+      "current_live_directory": 0.9468,
+      "current_model_stack": 0.9095,
+      "negation_attribution": 0.9737,
+      "unproven_causality": 0.9905,
+      "corrected_deadline": 1.0,
+      "current_reranker": 0.9942
+    }
   }
 }
