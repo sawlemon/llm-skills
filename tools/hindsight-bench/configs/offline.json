@@ -7,6 +7,18 @@
       "expected": "pass"
     },
     {
+      "label": "glm-medium",
+      "model": "z-ai/glm-5.3-flash",
+      "reasoning": { "effort": "medium", "exclude": true },
+      "expected": "pass"
+    },
+    {
+      "label": "glm-low",
+      "model": "z-ai/glm-5.3-flash",
+      "reasoning": { "effort": "low", "exclude": true },
+      "expected": "pass"
+    },
+    {
       "label": "nemotron-3-super-120b-free-high",
       "model": "nvidia/nemotron-3-super-120b-a12b:free",
       "reasoning": { "effort": "high", "exclude": true },

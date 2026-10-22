@@ -1,10 +1,12 @@
 # Cheaper-than-GLM-5.3-Flash candidates, including DeepSeek v4.1 Flash (2026-10-22)
 
-**Bottom line: keep `z-ai/glm-5.3-flash`.** It is effectively the price floor for
-this memory workload on OpenRouter. DeepSeek v4.1 Flash is 6–60× more expensive,
-not cheaper, and every model that IS cheaper than GLM 5.3 Flash either fails the
-structured extraction task outright or comes from a free provider that is broken
-or rate-limited today. No switch was made.
+**Bottom line: keep `z-ai/glm-5.3-flash` at `reasoning_effort=high`.** It is
+effectively the price floor for this memory workload on OpenRouter. DeepSeek v4.1
+Flash is 6–60× more expensive, not cheaper, and every model that IS cheaper than
+GLM 5.3 Flash either fails the structured extraction task outright or comes from
+a free provider that is broken or rate-limited today. A reasoning-effort sweep
+additionally shows high effort is GLM's *cheapest* setting (lower efforts emit
+more reasoning tokens). No switch was made.
 
 ## Why the investigation started
 
@@ -93,6 +95,44 @@ the free tier is not a production option for this workload regardless of quota.
 matrix entries for the four benched candidates are committed in
 `configs/offline.json` for future re-tests.
 
+## Step 3 — reasoning-effort sweep: high is also the cheapest setting
+
+The August campaign measured GLM 5.3 Flash only at effort=high (pass) and
+effort=none (endpoint rejects — "Reasoning is mandatory for this endpoint and
+cannot be disabled", reconfirmed today). Low and medium had never been measured;
+this sweep (`20261022T154559Z-60d88d`, 3 runs each) closes that gap.
+
+Bench results (same suites, same fixtures):
+
+| effort | matrix (13 criteria) | adversarial (19 criteria) | median latency |
+| --- | --- | --- | ---: |
+| high | 13/13 ×3 | 16–17/19 | 12.8 s |
+| medium | 13/13 ×3 | 17/19 | 10.1 s |
+| low | 13/13 ×3 | 17–18/19 | 10.2 s |
+| none | skip — endpoint rejects disabled reasoning | | |
+
+Quality is flat across efforts; the residual adversarial misses are the same
+alias-artifact / qualifier-omission classes described above (effort=high
+variants of the facts actually preserved the "timing is suspicious" qualifier;
+one effort=low sample split the timeout fact in two, the known split-fact
+artifact).
+
+Cost per call, however, is NOT flat — one usage probe per effort on the
+adversarial fixture (n=1 each, but monotonic and consistent with the 3-run
+bench):
+
+| effort | reasoning tokens | completion tokens | cost/call |
+| --- | ---: | ---: | ---: |
+| **high** | **736** | **2,087** | **$0.00043** |
+| medium | 1,605 | 2,994 | $0.00061 |
+| low | 1,903 | 3,446 | $0.00070 |
+
+Counterintuitively, GLM 5.3 Flash emits MORE reasoning tokens as effort
+decreases on this provider route, so effort=low costs ~63% more per call than
+effort=high. Dropping the server's effort setting would increase, not decrease,
+the OpenRouter bill — the earlier hypothesis that effort was the cost lever is
+disproved by measurement.
+
 ## Decision
 
 1. **Keep `z-ai/glm-5.3-flash` for general + reflect.** Nothing cheaper passed;
@@ -101,8 +141,8 @@ matrix entries for the four benched candidates are committed in
    transient provider outages) — `--model nemotron-3-super-120b-free-high ...`
    with the committed matrix entries makes that a one-liner. Do not hold your
    breath for the 120B: its sibling that did answer returned no facts at all.
-3. If spend must drop further, the levers are effort, not models: GLM's output
-   price ($0.1985/M) is where its cost lives, and `effort=high` burns reasoning
-   tokens as output. Dropping reflect/general to `effort=low`/`medium` is the
-   cheapest real saving available — a quality trade this benchmark has not
-   evaluated end-to-end.
+3. **Keep `reasoning_effort=high`.** The effort sweep shows high is both the
+   quality-safe setting and the cheapest per call (fewest reasoning tokens);
+   lowering it would raise the bill by ~40–60% at flat quality. The ~$4/month
+   GLM spend has no measured lever that reduces it without giving up the only
+   model that passes these suites.
