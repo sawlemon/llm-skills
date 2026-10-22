@@ -89,11 +89,13 @@ def parse_extraction(body: dict) -> list[dict]:
         raise ExtractionParseError(f"malformed chat response: {error}") from error
     if isinstance(content, dict):
         data = content
-    else:
+    elif isinstance(content, str):
         try:
             data = json.loads(content)
         except ValueError as error:
             raise ExtractionParseError(f"model returned non-JSON content: {error}") from error
+    else:
+        raise ExtractionParseError(f"model returned no content ({type(content).__name__})")
     facts = data.get("facts")
     if not isinstance(facts, list):
         raise ExtractionParseError("extraction JSON lacks a 'facts' array")
