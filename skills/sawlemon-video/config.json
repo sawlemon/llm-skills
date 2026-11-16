@@ -1,0 +1,24 @@
+{
+  "proxy": {
+    "base_url": "http://127.0.0.1:8317",
+    "config_file": "/opt/homebrew/etc/cliproxyapi.conf"
+  },
+  "models": {
+    "transcribe": "gemini-3.8-flash-high",
+    "metadata": "gemini-3.8-flash-high",
+    "image": "gpt-image-2.5-flare"
+  },
+  "image": {
+    "quality": "medium",
+    "size": "1024x1536",
+    "default_reference": "/Users/sala/Downloads/Personal/sawlemon/media/thumbnail/cartoon-avatar-REFERENCE.png"
+  },
+  "paths": {
+    "library": "/Users/sala/Downloads/Personal/sawlemon/media/temp files",
+    "thumbnail_dir": "/Users/sala/Downloads/Personal/sawlemon/media/thumbnail"
+  },
+  "social": {
+    "x": "https://x.com/saw_lemon_x",
+    "linkedin": "https://www.linkedin.com/in/solomonraja/"
+  }
+}
