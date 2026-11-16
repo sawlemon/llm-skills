@@ -39,6 +39,8 @@ class ParseTests(unittest.TestCase):
             parse_extraction({"choices": []})
         with self.assertRaises(ExtractionParseError):
             parse_extraction({"choices": [{"message": {"content": "not json"}}]})
+        with self.assertRaises(ExtractionParseError):
+            parse_extraction({"choices": [{"message": {"content": None}}]})
 
     def test_schema_strict(self):
         self.assertTrue(EXTRACTION_SCHEMA["additionalProperties"] is False)

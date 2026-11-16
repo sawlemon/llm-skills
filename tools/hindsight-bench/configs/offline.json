@@ -7,6 +7,42 @@
       "expected": "pass"
     },
     {
+      "label": "glm-medium",
+      "model": "z-ai/glm-5.3-flash",
+      "reasoning": { "effort": "medium", "exclude": true },
+      "expected": "pass"
+    },
+    {
+      "label": "glm-low",
+      "model": "z-ai/glm-5.3-flash",
+      "reasoning": { "effort": "low", "exclude": true },
+      "expected": "pass"
+    },
+    {
+      "label": "nemotron-3-super-120b-free-high",
+      "model": "nvidia/nemotron-3-super-120b-a12b:free",
+      "reasoning": { "effort": "high", "exclude": true },
+      "expected": "pass"
+    },
+    {
+      "label": "nemotron-3.5-super-vl-free",
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "reasoning": null,
+      "expected": "pass"
+    },
+    {
+      "label": "xing4-29b-free",
+      "model": "xingchen-agi/xing4.0-29b-a4b:free",
+      "reasoning": null,
+      "expected": "pass"
+    },
+    {
+      "label": "nex-n2.5-mini-high",
+      "model": "nex-agi/nex-n2.5-mini",
+      "reasoning": { "effort": "high", "exclude": true },
+      "expected": "pass"
+    },
+    {
       "label": "glm-none",
       "model": "z-ai/glm-5.3-flash",
       "reasoning": { "effort": "none", "exclude": true },
