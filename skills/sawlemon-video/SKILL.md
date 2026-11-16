@@ -44,7 +44,8 @@ Input: a list of things the user wants on screen (logos, sites, repos, articles,
    `Readable close-ups/`.
 6. Write `SOURCES.md` in the video folder: file, what it shows, source URL, credit/licence notes. Flag non-commercial
    licences (e.g. xkcd CC BY-NC). Mark reconstructions/illustrations as such. Never present one as an authentic
-   screenshot. Record researcher/author full names here; they go into the description later.
+   screenshot. Record researcher/author full names here, and capture a readable screenshot of the byline/names (the user
+   shows names on screen rather than in the description).
 7. Diagrams the user asks for (e.g. a dependency chain): draw them as SVG and render with sips to a transparent 1920x1080 PNG.
    Never claim an image was generated unless the file exists locally.
 8. Run `assets.py check "<Video Name>"` (and `check-file` for new root logos). Every file must pass. Then look at the
@@ -98,8 +99,9 @@ python3 -I scripts/metadata.py "<Video Name>"
 2. You then write `metadata-FINAL.md` from the draft. Keep its style, because the user prefers Gemini's punchy titles. Only fix:
    - every fact-check issue and mechanical issue (unsupported claims like "root access", wrong attribution like
      "ChatGPT RCE" when the RCE was on a forum server, transient → transitive, mis-heard names from `--terms`);
-   - promises the speaker makes ("full names description-la") → add a **Research credit** block with full names and the
-     original source link from `SOURCES.md`;
+   - promises the speaker makes ("full names description-la") that the draft lacks: do not add them automatically.
+     Report each one to the user (the user may show it on screen instead, e.g. a screenshot of researcher names) and add
+     it only if they ask, using the full names / source link from `SOURCES.md`;
    - timestamps: check each against the SRT.
    Then re-read the fact-check yourself against the SRT, because the model check misses things. Tell the user exactly
    what you changed and why.
