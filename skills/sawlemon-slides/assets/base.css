@@ -1,0 +1,95 @@
+/* Layout shared by every theme. Themes only change the look. */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:#000}
+.stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform:translate(-50%,-50%) scale(var(--s,1));overflow:hidden;-webkit-font-smoothing:antialiased}
+.slide{position:absolute;inset:0;padding:96px 150px 130px;display:flex;flex-direction:column;justify-content:center;gap:40px;opacity:0;visibility:hidden;transition:opacity .35s}
+.slide.active{opacity:1;visibility:visible}
+.slide>*{position:relative;z-index:2}
+.slide.active>*{animation:rise .7s cubic-bezier(.2,.8,.2,1) both}
+.slide.active>*:nth-child(2){animation-delay:.08s}
+.slide.active>*:nth-child(3){animation-delay:.18s}
+.slide.active>*:nth-child(4){animation-delay:.28s}
+.slide.active>*:nth-child(5){animation-delay:.38s}
+@keyframes rise{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+.still *{animation:none!important;transition:none!important}
+
+h1,h2,h3{line-height:1.05}
+h2{font-size:84px}
+h3{font-size:38px;margin-bottom:12px}
+em,i{font-style:normal}
+.lead{font-size:40px;line-height:1.35;max-width:1350px}
+.center{text-align:center;margin:0 auto}
+.kicker{font-size:28px;letter-spacing:.14em;text-transform:uppercase}
+.ico{display:block;font-size:60px;line-height:1;margin-bottom:18px}
+.ico-inline{margin-right:10px}
+code,.mono{font-family:var(--mono)}
+code{font-size:.9em}
+
+.chips{display:flex;flex-wrap:wrap;gap:16px}
+.chip{font-size:26px;padding:10px 24px}
+.chips.big .chip{font-size:32px;padding:12px 28px}
+
+.split{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:stretch}
+.stack{display:flex;flex-direction:column;gap:36px}
+.s-php .split{grid-template-columns:1.45fr 1fr;align-items:center}
+.stat{text-align:center}
+.stat .num{font-size:210px;line-height:.95}
+.stat .lbl{font-size:36px;margin-top:10px}
+.stat .src{font-size:20px;opacity:.6;margin-top:10px}
+
+.card,.analogy,.tech-box,.step,.node{padding:38px 42px}
+.card p,.analogy p,.tech-box p,.step p{font-size:30px;line-height:1.4}
+.tech-box p+p,.card p+p{margin-top:16px}
+.tag{font-size:24px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-bottom:16px}
+.callout,.tech,.rule,.note,.credits{font-size:30px;line-height:1.4;padding:24px 36px}
+
+.flow{display:flex;align-items:stretch;justify-content:center;gap:20px}
+.node{flex:1;max-width:330px;text-align:center;padding:34px 18px}
+.node .ico{font-size:72px}
+.node b{display:block;font-size:36px}
+.node small{display:block;font-size:24px;margin-top:8px;opacity:.8}
+.arrow{align-self:center;font-size:56px}
+.s-hotel .rule{align-self:center}
+
+.cols3,.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:34px}
+.step{position:relative}
+.step .n{font-size:96px;line-height:1;margin-bottom:10px}
+.step .ico{position:absolute;top:36px;right:38px;font-size:64px}
+
+.grid4{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.card.row{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:start;padding:30px 38px}
+.card.row .ico{font-size:56px;margin:0}
+.card.row h3{font-size:34px;margin-bottom:6px}
+.card.row p{font-size:27px}
+
+.meter{display:flex;align-items:center;gap:24px;font-size:26px}
+.m-label{font-weight:700;text-transform:uppercase;letter-spacing:.1em}
+.m-bar{width:300px;height:22px;position:relative;overflow:hidden}
+.m-fill{position:absolute;inset:0 8% 0 0}
+.m-val{font-size:34px;font-weight:800}
+.m-note{opacity:.85}
+
+.timeline{display:flex;flex-direction:column;gap:22px}
+.t{display:grid;grid-template-columns:230px 1fr;gap:24px;align-items:baseline;padding:20px 28px}
+.t b{font-size:40px}
+.t span{font-size:28px;line-height:1.35}
+blockquote{display:flex;align-items:center;font-size:66px;line-height:1.15;padding:40px 48px}
+
+.versions{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.versions .v{font-family:var(--mono);font-size:40px;font-weight:700;padding:10px 26px}
+.versions small{font-size:24px;margin-left:12px;opacity:.75}
+.s-fix ul{list-style:none;margin:14px 0;font-size:26px;line-height:1.7}
+.s-fix ul small{opacity:.7}
+
+.s-title{align-items:center;text-align:center}
+.s-title .mega{font-size:250px;line-height:.95}
+.s-title .lead{font-size:44px;max-width:1300px}
+.s-title .chips{justify-content:center}
+
+.s-end .quote{font-size:82px;line-height:1.12;max-width:1600px}
+.outro{display:flex;align-items:center;gap:36px}
+.logo-big{font-size:64px}
+.cta{font-size:32px}
+.sources{font-size:20px;opacity:.6}
+
+.brandbar{position:absolute;left:150px;right:150px;bottom:44px;display:flex;justify-content:space-between;align-items:center;font-size:22px;z-index:5}
