@@ -1,0 +1,65 @@
+<!-- Starter deck. One section.slide per slide. Keep every slide to a few big words.
+     Full working reference of every pattern: examples/php2shell/slides.html -->
+
+<!-- Title -->
+<section class="slide s-title">
+  <div class="kicker">Month YYYY · Explained simply</div>
+  <h1 class="mega">NAME<span class="hl">2</span>X</h1>
+  <p class="lead">How <em>one simple thing</em> let attackers do something big</p>
+  <div class="chips"><span class="chip">CVE-XXXX-XXXXX</span><span class="chip hot">CVSS X.X · Critical</span></div>
+</section>
+
+<!-- Three beats: the core minimal pattern -->
+<section class="slide s-bug">
+  <div class="kicker">Step 1 · Where it breaks</div>
+  <h2>Short title with <span class="hl">one red word</span></h2>
+  <div class="beats">
+    <div class="beat"><span class="ico">⚙️</span><b>Two words</b></div>
+    <div class="arrow">→</div>
+    <div class="beat hot"><span class="ico">💥</span><b>Two words</b></div>
+    <div class="arrow">→</div>
+    <div class="beat"><span class="ico">😈</span><b>Two words</b></div>
+  </div>
+  <p class="punch">One line takeaway → <span class="hl">the result</span></p>
+</section>
+
+<!-- Step-by-step diagram skeleton: each → press reveals the next step.
+     data-show="n" = visible from step n; data-hide="m" = hidden again from step m. -->
+<section class="slide s-anim" data-steps="3">
+  <div class="kicker">Bug #1 · CVE-XXXX-XXXXX</div>
+  <h2>The <span class="hl">analogy</span> title</h2>
+  <div class="lane">
+    <span class="lchip" data-show="1" data-hide="2">① Request 1</span>
+    <span class="lchip" data-show="2">② Request 2 · attacker</span>
+  </div>
+  <div class="diagram d1">
+    <div class="dlabel">Worker memory</div>
+    <div class="blk" style="left:0"><div class="ly junk"><i>😈</i><b>old junk</b></div><div class="ly good fx" data-show="2"><i>✅</i><b>PHP data</b></div></div>
+    <div class="blk" style="left:276px"><div class="ly junk"><i>😈</i><b>old junk</b></div></div>
+    <div class="boom fx" data-show="3" style="left:400px">💥<b>CRASH</b></div>
+  </div>
+  <div class="caprow">
+    <div class="caps">
+      <p class="cap fx" data-show="1" data-hide="2">Step one in <span class="hl">few words</span></p>
+      <p class="cap fx" data-show="2" data-hide="3">Step two in few words</p>
+      <p class="cap fx" data-show="3">Step three → <span class="hl">result</span></p>
+    </div>
+    <div class="shell fx" data-show="3"><span>$ whoami</span><b>www-data 🐚</b></div>
+  </div>
+</section>
+
+<!-- Fix -->
+<section class="slide s-fix">
+  <div class="kicker">What should you do?</div>
+  <h2><span class="hl">Update</span>. Restart. Done.</h2>
+  <div class="versions"><span class="v">X.Y.Z</span><span class="v">X.Y.Z</span></div>
+  <p class="punch">Fixed on DD Mon YYYY</p>
+</section>
+
+<!-- Outro -->
+<section class="slide s-end">
+  <div class="kicker">In one sentence</div>
+  <h1 class="quote">The whole story in one plain sentence, with <span class="hl">the key part</span> in red.</h1>
+  <div class="outro"><span class="logo-big">SAWLEMON</span><span class="cta">Let's learn cybersecurity · Subscribe 🍋</span></div>
+  <div class="sources">Sources: primary advisory · researcher blog · vendor post</div>
+</section>

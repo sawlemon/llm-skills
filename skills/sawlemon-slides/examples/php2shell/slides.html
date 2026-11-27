@@ -1,0 +1,191 @@
+<!-- 01 · Title -->
+<section class="slide s-title">
+  <div class="kicker">October 2026 · Explained simply</div>
+  <h1 class="mega">PHP<span class="hl">2</span>Shell</h1>
+  <p class="lead">How <em>running out of memory</em> let hackers take over servers</p>
+  <div class="chips"><span class="chip">CVE-2026-109618</span><span class="chip">CVE-2026-109619</span><span class="chip hot">CVSS 9.2 · Critical</span></div>
+</section>
+
+<!-- 02 · What is PHP -->
+<section class="slide s-php">
+  <div class="kicker">Step 1 · The basics</div>
+  <h2>What is <span class="hl">PHP</span>?</h2>
+  <div class="split">
+    <div class="stack">
+      <p class="lead big">The language <em>behind</em> most websites.</p>
+      <div class="chips big"><span class="chip">WordPress</span><span class="chip">Drupal</span><span class="chip">Joomla</span><span class="chip">Wikipedia</span></div>
+    </div>
+    <div class="stat"><div class="num">~70%</div><div class="lbl">of all websites</div></div>
+  </div>
+  <p class="punch">The bug is in <span class="hl">PHP itself</span>.</p>
+</section>
+
+<!-- 03 · Hotel analogy (kept as approved) -->
+<section class="slide s-hotel">
+  <div class="kicker">Step 2 · How PHP serves visitors</div>
+  <h2>Think of PHP like a <span class="hl">hotel</span></h2>
+  <div class="flow">
+    <div class="node"><span class="ico">🧳</span><b>Guest 1</b><small>a web request</small></div>
+    <div class="arrow">→</div>
+    <div class="node main"><span class="ico">🛏️</span><b>Room 101</b><small>a PHP “worker”</small></div>
+    <div class="arrow">→</div>
+    <div class="node good"><span class="ico">🧹</span><b>Housekeeping</b><small>reset the memory</small></div>
+    <div class="arrow">→</div>
+    <div class="node"><span class="ico">🧳</span><b>Guest 2</b><small>the next request</small></div>
+  </div>
+  <p class="lead center">A server has only a few rooms (workers). Each room is <em>reused</em> guest after guest. That's fast, and it's safe only if housekeeping does its job.</p>
+  <div class="rule"><span class="ico-inline">🏨</span> Golden rule: <b>clean the room before the next guest checks in.</b></div>
+</section>
+
+<!-- 04 · Out of memory -->
+<section class="slide s-alarm">
+  <div class="kicker">Step 3 · Where it breaks</div>
+  <h2>Out of memory? <span class="hl">PHP stops dead.</span></h2>
+  <div class="membar">
+    <div class="mb-track"><span class="mb-in">request memory →</span><span class="mb-boom">💥 FATAL</span></div>
+    <div class="mb-limit"><span>memory_limit</span></div>
+  </div>
+  <div class="beats">
+    <div class="beat"><span class="ico">⚙️</span><b>Working</b></div>
+    <div class="arrow">→</div>
+    <div class="beat hot"><span class="ico">💥</span><b>Limit hit</b></div>
+    <div class="arrow">→</div>
+    <div class="beat"><span class="ico">🧹</span><b>Cleanup skipped</b></div>
+  </div>
+</section>
+
+<!-- 05 · Bug 1 · step-by-step -->
+<section class="slide s-anim s-bug1" data-steps="6">
+  <div class="kicker">Bug #1 · CVE-2026-109618</div>
+  <h2>The <span class="hl">half-unpacked</span> suitcase</h2>
+  <div class="lane">
+    <span class="lchip" data-show="1" data-hide="2">① Request 1 · attacker</span>
+    <span class="lchip" data-show="2" data-hide="5">② Request 2 · attacker upload</span>
+    <span class="lchip" data-show="5">③ Request 2 ends · cleanup</span>
+  </div>
+  <div class="diagram d1">
+    <div class="dlabel">Worker memory</div>
+    <div class="blk" style="left:0"><div class="ly junk"><i>😈</i><b>old junk</b></div><div class="ly good fx" data-show="2" style="--d:0s"><i>✅</i><b>PHP data</b></div><div class="ok fx" data-show="5">trusted</div></div>
+    <div class="blk" style="left:276px"><div class="ly junk"><i>😈</i><b>old junk</b></div><div class="ly good fx" data-show="2" style="--d:.3s"><i>✅</i><b>PHP data</b></div><div class="ok fx" data-show="5">trusted</div></div>
+    <div class="blk" style="left:552px"><div class="ly junk"><i>😈</i><b>old junk</b></div><div class="ly good fx" data-show="2" style="--d:.6s"><i>✅</i><b>PHP data</b></div><div class="ok fx" data-show="5">trusted</div></div>
+    <div class="blk" style="left:828px"><div class="ly junk r"><i>😈</i><b>junk</b></div><div class="ly half fx" data-show="2" style="--d:.9s"><i>✅</i><b>half</b></div><div class="ok fx" data-show="5">trusted</div></div>
+    <div class="blk" style="left:1104px"><div class="ly junk"><i>😈</i><b>old junk</b></div><div class="ok fx" data-show="5">trusted</div></div>
+    <div class="blk" style="left:1380px"><div class="ly junk"><i>😈</i><b>old junk</b></div><div class="ok fx" data-show="5">trusted</div></div>
+    <div class="boom fx" data-show="3" data-hide="5" style="left:948px">💥<b>OUT OF MEMORY</b></div>
+    <div class="brk good-brk fx" data-show="4" style="left:0;width:792px"><span>✓ finished</span></div>
+    <div class="brk bad-brk fx" data-show="4" style="left:828px;width:792px"><span>✗ never finished: old junk still here</span></div>
+    <div class="scan fx" data-show="5"><span>🔍 Cleanup: “this all looks complete”</span></div>
+  </div>
+  <div class="caprow">
+    <div class="caps">
+      <p class="cap fx" data-show="1" data-hide="2">An earlier request leaves <span class="hl">junk</span> in memory</p>
+      <p class="cap fx" data-show="2" data-hide="3">PHP starts building data on top</p>
+      <p class="cap fx" data-show="3" data-hide="4">Memory runs out <span class="hl">halfway</span></p>
+      <p class="cap fx" data-show="4" data-hide="5">PHP stops. The data is <span class="hl">half-built</span></p>
+      <p class="cap fx" data-show="5" data-hide="6">Cleanup trusts <span class="hl">all of it</span></p>
+      <p class="cap fx" data-show="6">It uses the junk → <span class="hl">attacker's code runs</span></p>
+    </div>
+    <div class="shell fx" data-show="6"><span>$ whoami</span><b>www-data 🐚</b></div>
+  </div>
+</section>
+
+<!-- 06 · Bug 2 · step-by-step -->
+<section class="slide s-anim s-bug2" data-steps="6">
+  <div class="kicker">Bug #2 · CVE-2026-109619</div>
+  <h2>The <span class="hl">sticky note</span> nobody removed</h2>
+  <div class="lane">
+    <span class="lchip" data-show="1" data-hide="3">① Request 1</span>
+    <span class="lchip" data-show="3" data-hide="4">PHP frees memory</span>
+    <span class="lchip" data-show="4" data-hide="5">② Request 2 · attacker</span>
+    <span class="lchip" data-show="5">③ Request 3</span>
+  </div>
+  <div class="diagram d2">
+    <div class="board">
+      <h4>📌 PHP's notes</h4><small>kept between requests</small>
+      <div class="sticky">Your data is in <b>slot 5</b></div>
+      <div class="stamp fx" data-show="3">NOT REMOVED</div>
+    </div>
+    <svg class="ptr" width="1620" height="400" viewBox="0 0 1620 400">
+      <defs>
+        <marker id="ah-ink" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#111"/></marker>
+        <marker id="ah-red" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#FF3131"/></marker>
+      </defs>
+      <path class="p-base" d="M404 170 C 650 -20, 1150 -20, 1337 92" marker-end="url(#ah-ink)"/>
+      <path class="p-hot fx" data-show="5" d="M404 170 C 650 -20, 1150 -20, 1337 92" marker-end="url(#ah-red)"/>
+    </svg>
+    <div class="slot" style="left:500px"><div class="ly used fx" data-show="1" data-hide="3">data</div><div class="ly freed fx" data-show="3">freed</div><span class="num">1</span></div>
+    <div class="slot" style="left:688px"><div class="ly used fx" data-show="1" data-hide="3">data</div><div class="ly freed fx" data-show="3">freed</div><span class="num">2</span></div>
+    <div class="slot" style="left:876px"><div class="ly used fx" data-show="1" data-hide="3">data</div><div class="ly freed fx" data-show="3">freed</div><span class="num">3</span></div>
+    <div class="slot" style="left:1064px"><div class="ly used fx" data-show="1" data-hide="3">data</div><div class="ly freed fx" data-show="3">freed</div><span class="num">4</span></div>
+    <div class="slot" style="left:1252px"><div class="ly used mine fx" data-show="1" data-hide="3"><i>📦</i>your data</div><div class="ly freed fx" data-show="3" data-hide="4">freed</div><div class="ly evil fx" data-show="4"><i>😈</i>attacker data</div><span class="num">5</span></div>
+    <div class="slot" style="left:1440px"><div class="ly freed fx" data-show="3">freed</div><span class="num">6</span></div>
+    <div class="boom fx" data-show="2" data-hide="3" style="left:1060px;top:110px">💥<b>CRASH</b></div>
+    <div class="mlabel">Request memory</div>
+  </div>
+  <div class="caprow">
+    <div class="caps">
+      <p class="cap fx" data-show="1" data-hide="2">Request 1 saves data. PHP <span class="hl">notes where</span></p>
+      <p class="cap fx" data-show="2" data-hide="3">Request 1 <span class="hl">crashes</span></p>
+      <p class="cap fx" data-show="3" data-hide="4">Memory freed. <span class="hl">The note stays</span></p>
+      <p class="cap fx" data-show="4" data-hide="5">Attacker's data lands in <span class="hl">slot 5</span></p>
+      <p class="cap fx" data-show="5" data-hide="6">Request 3 follows <span class="hl">the old note</span></p>
+      <p class="cap fx" data-show="6">PHP trusts it → <span class="hl">attacker's code runs</span></p>
+    </div>
+    <div class="shell fx" data-show="6"><span>use-after-free</span><b>www-data 🐚</b></div>
+  </div>
+</section>
+
+<!-- 07 · Attack steps -->
+<section class="slide s-steps">
+  <div class="kicker">Putting it together</div>
+  <h2>The attack in <span class="hl">3 moves</span></h2>
+  <div class="steps">
+    <div class="step"><div class="n">1</div><span class="ico">💥</span><h3>Crash it</h3><p>Run out of memory</p></div>
+    <div class="step"><div class="n">2</div><span class="ico">📦</span><h3>Fill it</h3><p>Plant attacker data</p></div>
+    <div class="step hot"><div class="n">3</div><span class="ico">🐚</span><h3>Trigger it</h3><p>Attacker's code runs</p></div>
+  </div>
+  <p class="punch">No login. No website bug.</p>
+</section>
+
+<!-- 08 · Impact -->
+<section class="slide s-impact">
+  <div class="kicker">Why everyone panicked</div>
+  <h2>How <span class="hl">bad</span> was it?</h2>
+  <div class="grid4">
+    <div class="card row"><span class="ico">🔓</span><h3>No login needed</h3></div>
+    <div class="card row"><span class="ico">🔑</span><h3>Secrets leak</h3></div>
+    <div class="card row"><span class="ico">🌐</span><h3>Any PHP website</h3></div>
+    <div class="card row"><span class="ico">🕰️</span><h3>10+ years old</h3></div>
+  </div>
+  <div class="meter"><span class="m-label">Severity</span><span class="m-bar"><span class="m-fill"></span></span><span class="m-val">9.2 / 10</span></div>
+</section>
+
+<!-- 09 · AI twist -->
+<section class="slide s-ai">
+  <div class="kicker">The plot twist</div>
+  <h2><span class="hl">AI</span> helped build the exploit</h2>
+  <div class="beats">
+    <div class="beat"><span class="ico">🕰️</span><b>Hidden 10+&nbsp;years</b></div>
+    <div class="arrow">→</div>
+    <div class="beat"><span class="ico">🧠</span><b>Too complex for humans</b></div>
+    <div class="arrow">→</div>
+    <div class="beat hot"><span class="ico">🤖</span><b>Hours with AI</b></div>
+  </div>
+  <div class="credits">Found by <b>Wiz Research</b> · Sagi Tzadik, Shir Tamari, Nir Ohfeld, Tomer Schwartz</div>
+</section>
+
+<!-- 10 · Fix -->
+<section class="slide s-fix">
+  <div class="kicker">What should you do?</div>
+  <h2><span class="hl">Update</span> PHP. Restart. Done.</h2>
+  <div class="versions"><span class="v">8.5.12</span><span class="v">8.4.27</span><span class="v">8.3.36</span><span class="v">8.2.35</span></div>
+  <p class="punch">Fixed on 21 Oct 2026</p>
+</section>
+
+<!-- 11 · Outro (kept as approved) -->
+<section class="slide s-end">
+  <div class="kicker">In one sentence</div>
+  <h1 class="quote">PHP got kicked out mid-task, <span class="hl">forgot to clean up</span>, and the next visitor used the mess to take over the server.</h1>
+  <div class="outro"><span class="logo-big">SAWLEMON</span><span class="cta">Let's learn cybersecurity · Subscribe 🍋</span></div>
+  <div class="sources">Sources: wiz.io/blog/php2shell-php-rce · php-src advisories GHSA-w8hw-w9fx-j79w &amp; GHSA-6wmf-4rv5-p3rp · thephp.foundation</div>
+</section>
